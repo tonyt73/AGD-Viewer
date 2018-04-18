@@ -18,3 +18,4 @@ __recovery/
 * - Copy.*
 *.res
 *.vlb
+Build/
