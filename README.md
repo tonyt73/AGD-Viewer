@@ -17,3 +17,8 @@ It's pretty simple.
 
 Ctrl+Mouse wheel -> Zoom
 Mouse wheel -> Scroll Vertically
+
+Supports:
+* ZX Spectrum 8x8 attribute mode
+* ZX Spectrum Next/Timex 8x1 attribute mode
+* Amstrad CPC mode 0 - still needs some work
