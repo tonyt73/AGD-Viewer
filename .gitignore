@@ -1,0 +1,20 @@
+Next.Pixel.cbproj.local
+*.local
+*.stat
+__astcache/
+__history/
+*.d
+*.o
+*.so
+*.apk
+Android/Debug/
+Android/Release/
+*.obj
+*.exe
+Win32/
+Win64/
+Art/Thumbs.db
+__recovery/
+* - Copy.*
+*.res
+*.vlb
