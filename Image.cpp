@@ -173,8 +173,14 @@ void __fastcall Image::DrawAmstradCPC(const BitmapData& data, int offset)
         for (auto x = 0; x < cw; x++)
         {
             auto pixels = data[y*cw+x];
-            auto p0 = (pixels & 0xF0) >> 4;
-            auto p1 = (pixels & 0x0F);
+            auto p0  = (pixels & 0x80) >> 7;
+                 p0 |= (pixels & 0x20) >> 3;
+                 p0 |= (pixels & 0x08) >> 2;
+                 p0 |= (pixels & 0x02) << 2;
+            auto p1  = (pixels & 0x40) >> 6;
+                 p1 |= (pixels & 0x10) >> 2;
+                 p1 |= (pixels & 0x04) >> 1;
+                 p1 |= (pixels & 0x01) << 3;
             m_Bitmap->Canvas->Pixels[offset+(x*2)+0][y] = g_ColorsAmstrad[p0];
             m_Bitmap->Canvas->Pixels[offset+(x*2)+1][y] = g_ColorsAmstrad[p1];
         }

@@ -3601,7 +3601,6 @@ object frmMain: TfrmMain
       item
         Width = 50
       end>
-    ExplicitTop = 632
   end
   object pgcViews: TPageControl
     Left = 0
@@ -3619,10 +3618,8 @@ object frmMain: TfrmMain
     TabHeight = 40
     TabOrder = 1
     TabWidth = 120
-    ExplicitHeight = 592
     object tabImages: TTabSheet
       Caption = 'Images'
-      ExplicitHeight = 542
       object sbxView: TScrollBox
         Left = 0
         Top = 0
@@ -3634,7 +3631,6 @@ object frmMain: TfrmMain
         BorderStyle = bsNone
         TabOrder = 0
         OnMouseWheel = sbxViewMouseWheel
-        ExplicitHeight = 542
         object imgView: TImage
           Left = 0
           Top = 0
@@ -3855,7 +3851,7 @@ object frmMain: TfrmMain
     Left = 220
     Top = 147
     Bitmap = {
-      494C0101080068004C0020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108006800500020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

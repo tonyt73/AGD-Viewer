@@ -20,6 +20,7 @@ void __fastcall TfrmMain::actFileOpenAccept(TObject *Sender)
 {
     if (System::Ioutils::TFile::Exists(actFileOpen->Dialog->FileName))
     {
+        Caption = "AGDv - " + actFileOpen->Dialog->FileName;
         m_Blocks.clear();
         m_Objects.clear();
         m_Sprites.clear();
