@@ -4,7 +4,7 @@ An application to view Arcade Game Designer .agd text files
 Load a .agd file and see it in all it's glory.
 
 
-Please don't violate the original game authors rights by converting games that you haven't personally written or have the express permission of the author to use.
+**Please DON'T violate** the original game authors rights by converting games that you haven't personally written or have the express permission of the author to use.
 
 
 UI:
