@@ -133,30 +133,33 @@ String __fastcall TfrmMain::PreProcess(const String& data) const
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::Convert(const String& data)
 {
-    auto pdata = PreProcess(data);
-    if (data.Pos("defineblock") == 1)
+    if (data.Pos("definemessages") == 0)
     {
-        ConvertBlock(pdata);
-    }
-    else if (data.Pos("defineobject") == 1)
-    {
-        ConvertObject(pdata);
-    }
-    else if (data.Pos("definesprite") == 1)
-    {
-        ConvertSprite(pdata);
-    }
-    else if (data.Pos("definefont") == 1)
-    {
-        ConvertFont(pdata);
-    }
-    else if (data.Pos("definewindow") == 1)
-    {
-        ConvertWindow(pdata);
-    }
-    else if (data.Pos("definescreen") == 1)
-    {
-        ConvertScreen(pdata);
+        auto pdata = PreProcess(data);
+        if (data.Pos("defineblock") == 1)
+        {
+            ConvertBlock(pdata);
+        }
+        else if (data.Pos("defineobject") == 1)
+        {
+            ConvertObject(pdata);
+        }
+        else if (data.Pos("definesprite") == 1)
+        {
+            ConvertSprite(pdata);
+        }
+        else if (data.Pos("definefont") == 1)
+        {
+            ConvertFont(pdata);
+        }
+        else if (data.Pos("definewindow") == 1)
+        {
+            ConvertWindow(pdata);
+        }
+        else if (data.Pos("definescreen") == 1)
+        {
+            ConvertScreen(pdata);
+        }
     }
 }
 //---------------------------------------------------------------------------
