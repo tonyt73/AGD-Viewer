@@ -67,6 +67,7 @@ void __fastcall TfrmMain::OpenFile(const String& file)
         m_Sprites.clear();
         m_Font.clear();
         m_Screens.clear();
+        m_Messages.clear();
         m_Map = nullptr;
         // Load the file
         auto lines = System::Ioutils::TFile::ReadAllLines(file);
@@ -368,9 +369,10 @@ void __fastcall TfrmMain::RefreshImagesView()
     DisplayImages("SPRITES", m_Sprites, y, m_Scale, 3);
     // update the statistics
     barStatus->Panels->Items[0]->Text = "Font: " + IntToStr((int)m_Font.size());
-    barStatus->Panels->Items[1]->Text = "Blocks: " + IntToStr((int)m_Blocks.size());
-    barStatus->Panels->Items[2]->Text = "Objects: " + IntToStr((int)m_Objects.size());
-    barStatus->Panels->Items[3]->Text = "Sprites: " + IntToStr((int)m_Sprites.size());
+    barStatus->Panels->Items[1]->Text = "Messages: " + IntToStr((int)m_Messages.size());
+    barStatus->Panels->Items[2]->Text = "Blocks: " + IntToStr((int)m_Blocks.size());
+    barStatus->Panels->Items[3]->Text = "Objects: " + IntToStr((int)m_Objects.size());
+    barStatus->Panels->Items[4]->Text = "Sprites: " + IntToStr((int)m_Sprites.size());
     // refresh the image
     if (y + 32 != imgView->Height)
     {
