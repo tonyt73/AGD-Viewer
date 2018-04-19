@@ -16,6 +16,7 @@ It's pretty simple.
 * Checkboard -> Toggle between white/black and lime/black for the monochrome images
 
 Ctrl+Mouse wheel -> Zoom
+
 Mouse wheel -> Scroll Vertically
 
 Supports:
