@@ -3573,8 +3573,10 @@ object frmMain: TfrmMain
     0300008001000080010000000100000001000000000000000100008041000000
     07000000FF000081FF0000FFFF0000FFFF0000}
   OldCreateOrder = False
+  OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnDeactivate = FormDeactivate
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
@@ -5492,5 +5494,10 @@ object frmMain: TfrmMain
     OnTimer = Timer1Timer
     Left = 284
     Top = 142
+  end
+  object Timer2: TTimer
+    OnTimer = Timer2Timer
+    Left = 356
+    Top = 238
   end
 end

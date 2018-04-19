@@ -62,6 +62,7 @@ __published:	// IDE-managed Components
     TScrollBox *sbxMap;
     TImage *imgMap;
     TImage *imgZXFont;
+    TTimer *Timer2;
     void __fastcall FormResize(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
     void __fastcall FormDestroy(TObject *Sender);
@@ -76,6 +77,9 @@ __published:	// IDE-managed Components
     void __fastcall Timer1Timer(TObject *Sender);
     void __fastcall sbxViewMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta, TPoint &MousePos, bool &Handled);
     void __fastcall imgViewMouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
+    void __fastcall FormActivate(TObject *Sender);
+    void __fastcall Timer2Timer(TObject *Sender);
+    void __fastcall FormDeactivate(TObject *Sender);
 
 
 private:	// User declarations
@@ -94,6 +98,9 @@ private:	// User declarations
     TPoint              m_ImageCursorPos;
     TSize               m_ImageCursorSize;
     TPoint              m_Cursor;
+    String              m_File;
+
+
     virtual void __fastcall WMDropFiles(TWMDropFiles &message);
     BEGIN_MESSAGE_MAP
     MESSAGE_HANDLER(WM_DROPFILES,TWMDropFiles,WMDropFiles);

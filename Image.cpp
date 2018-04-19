@@ -392,8 +392,6 @@ __fastcall ImageFont::ImageFont(TBitmap* bitmap)
     m_Bitmap->Width = bitmap->Width;
     m_Bitmap->Height = bitmap->Height;
     BitBlt(m_Bitmap->Canvas->Handle, 0, 0, m_Bitmap->Width, m_Bitmap->Height, bitmap->Canvas->Handle, 0, 0, SRCCOPY);
-    bitmap->SaveToFile("E:\\bmp1.bmp");
-    m_Bitmap->SaveToFile("E:\\bmp2.bmp");
 }
 //---------------------------------------------------------------------------
 int __fastcall ImageFont::DrawChr(int x, int y, TBitmap* bitmap, int scalar, int character)

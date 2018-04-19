@@ -42,6 +42,8 @@ void __fastcall TfrmMain::FormCreate(TObject *Sender)
     OpenFile(ParamStr(1));
 
     DragAcceptFiles(Handle, true);
+    Application->OnActivate = FormActivate;
+    Application->OnDeactivate = FormDeactivate;
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::FormDestroy(TObject *Sender)
@@ -61,6 +63,7 @@ void __fastcall TfrmMain::OpenFile(const String& file)
 {
     if (TFile::Exists(file))
     {
+        m_File = file;
         Caption = "AGDv - " + file;
         m_Blocks.clear();
         m_Objects.clear();
@@ -336,7 +339,6 @@ void __fastcall TfrmMain::DisplayMessasges(const String& title, int& y, int scal
         // initialise the ZX Spectrum font
         auto bmp = std::make_unique<TBitmap>();
         bmp->Assign(imgZXFont->Picture->Graphic);
-        bmp->SaveToFile("E:\\graphic.bmp");
         m_Font.push_back(std::move(std::make_unique<ImageFont>(bmp.get())));
     }
     y -= 16;
@@ -605,6 +607,21 @@ void __fastcall TfrmMain::WMDropFiles(TWMDropFiles &message)
         OpenFile(String(filename));
     }
     DragFinish(hDrop);
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::FormActivate(TObject *Sender)
+{
+    Timer2->Enabled = false;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::Timer2Timer(TObject *Sender)
+{
+    OpenFile(m_File);
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::FormDeactivate(TObject *Sender)
+{
+    Timer2->Enabled = true;
 }
 //---------------------------------------------------------------------------
 
