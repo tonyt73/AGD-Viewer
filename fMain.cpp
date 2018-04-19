@@ -16,11 +16,52 @@ __fastcall TfrmMain::TfrmMain(TComponent* Owner)
 {
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::FormResize(TObject *Sender)
+{
+    imgView->Picture->Bitmap->Width = imgView->Width;
+    imgView->Picture->Bitmap->Height = imgView->Height;
+    RefreshImagesView();
+    RefreshMapView();
+    imgMap->Width = imgMap->Picture->Bitmap->Width;
+    imgMap->Height = imgMap->Picture->Bitmap->Height;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::FormCreate(TObject *Sender)
+{
+    imgView->Picture->Bitmap->Canvas->Brush->Color = clBlack;
+    imgView->Picture->Bitmap->Width = imgView->Width;
+    imgView->Picture->Bitmap->Height = imgView->Height;
+
+    imgView->Picture->Bitmap->Canvas->Brush->Style = bsClear; // Set the brush style to transparent.
+    imgView->Picture->Bitmap->Canvas->Font->Color = clWhite;
+    imgView->Picture->Bitmap->Canvas->Font->Name = "Courier New";
+    imgView->Picture->Bitmap->Canvas->Font->Height = 24;
+    imgView->Picture->Bitmap->Canvas->Font->Style <<= fsBold;
+
+    // check command line parameters
+    OpenFile(ParamStr(1));
+
+    DragAcceptFiles(Handle, true);
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::FormDestroy(TObject *Sender)
+{
+    DragAcceptFiles(Handle, false);
+}
+//---------------------------------------------------------------------------
 void __fastcall TfrmMain::actFileOpenAccept(TObject *Sender)
 {
     if (System::Ioutils::TFile::Exists(actFileOpen->Dialog->FileName))
     {
-        Caption = "AGDv - " + actFileOpen->Dialog->FileName;
+        OpenFile(actFileOpen->Dialog->FileName);
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::OpenFile(const String& file)
+{
+    if (TFile::Exists(file))
+    {
+        Caption = "AGDv - " + file;
         m_Blocks.clear();
         m_Objects.clear();
         m_Sprites.clear();
@@ -28,7 +69,7 @@ void __fastcall TfrmMain::actFileOpenAccept(TObject *Sender)
         m_Screens.clear();
         m_Map = nullptr;
         // Load the file
-        auto lines = System::Ioutils::TFile::ReadAllLines(actFileOpen->Dialog->FileName);
+        auto lines = System::Ioutils::TFile::ReadAllLines(file);
         String data = "";
         for (auto line : lines)
         {
@@ -64,9 +105,9 @@ void __fastcall TfrmMain::actFileOpenAccept(TObject *Sender)
                 }
             }
         }
+        RefreshImagesView();
+        RefreshMapView();
     }
-    RefreshImagesView();
-    RefreshMapView();
 }
 //---------------------------------------------------------------------------
 String __fastcall TfrmMain::PreProcess(const String& data) const
@@ -161,6 +202,10 @@ void __fastcall TfrmMain::Convert(const String& data)
             ConvertScreen(pdata);
         }
     }
+    else
+    {
+        ConvertMessages(data);
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::ConvertScreen(const String& data)
@@ -219,6 +264,22 @@ void __fastcall TfrmMain::ConvertFont(const String& data)
     m_Font.push_back(std::move(std::make_unique<ImageFont>(data)));
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::ConvertMessages(const String& data)
+{
+    // convert the data
+    auto mPos = data.Pos(" ");
+    auto mdata = data.SubString(mPos + 1, data.Length());
+    auto tokens = SplitString(mdata, "\"");
+    for (auto token : tokens)
+    {
+        token = token.Trim();
+        if (token != "")
+        {
+            m_Messages.push_back(token);
+        }
+    }
+}
+//---------------------------------------------------------------------------
 void __fastcall TfrmMain::actZoomInExecute(TObject *Sender)
 {
     m_Scale = std::min(16.f, m_Scale + 1.f);
@@ -245,29 +306,6 @@ void __fastcall TfrmMain::actZoomToFitExecute(TObject *Sender)
     //
 }
 //---------------------------------------------------------------------------
-void __fastcall TfrmMain::FormResize(TObject *Sender)
-{
-    imgView->Picture->Bitmap->Width = imgView->Width;
-    imgView->Picture->Bitmap->Height = imgView->Height;
-    RefreshImagesView();
-    RefreshMapView();
-    imgMap->Width = imgMap->Picture->Bitmap->Width;
-    imgMap->Height = imgMap->Picture->Bitmap->Height;
-}
-//---------------------------------------------------------------------------
-void __fastcall TfrmMain::FormCreate(TObject *Sender)
-{
-    imgView->Picture->Bitmap->Canvas->Brush->Color = clBlack;
-    imgView->Picture->Bitmap->Width = imgView->Width;
-    imgView->Picture->Bitmap->Height = imgView->Height;
-
-    imgView->Picture->Bitmap->Canvas->Brush->Style = bsClear; // Set the brush style to transparent.
-    imgView->Picture->Bitmap->Canvas->Font->Color = clWhite;
-    imgView->Picture->Bitmap->Canvas->Font->Name = "Courier New";
-    imgView->Picture->Bitmap->Canvas->Font->Height = 24;
-    imgView->Picture->Bitmap->Canvas->Font->Style <<= fsBold;
-}
-//---------------------------------------------------------------------------
 void __fastcall TfrmMain::DisplayImages(const String& title, const ImageList& images, int& y, int scale, int index)
 {
     auto my = 0;
@@ -290,6 +328,33 @@ void __fastcall TfrmMain::DisplayImages(const String& title, const ImageList& im
     y += my + 32;
 }
 //---------------------------------------------------------------------------
+void __fastcall TfrmMain::DisplayMessasges(const String& title, int& y, int scale)
+{
+    if (m_Font.size() == 0)
+    {
+        // initialise the ZX Spectrum font
+        auto bmp = std::make_unique<TBitmap>();
+        bmp->Assign(imgZXFont->Picture->Graphic);
+        bmp->SaveToFile("E:\\graphic.bmp");
+        m_Font.push_back(std::move(std::make_unique<ImageFont>(bmp.get())));
+    }
+    y -= 16;
+    imgView->Picture->Bitmap->Canvas->Pen->Color = clWhite;
+    imgView->Picture->Bitmap->Canvas->TextOut(8, y, title);
+    y += imgView->Picture->Bitmap->Canvas->TextHeight(title) + 8;
+    const auto font = dynamic_cast<ImageFont*>(m_Font[0].get());
+    for (const auto& message : m_Messages)
+    {
+        auto x = 32;
+        for (const auto& chr : message)
+        {
+            x += font->DrawChr(x, y, imgView->Picture->Bitmap, scale, chr - 32);
+        }
+        y += font->Height * scale;
+    }
+    y += 16;
+}
+//---------------------------------------------------------------------------
 void __fastcall TfrmMain::RefreshImagesView()
 {
     // clear the viewer
@@ -297,6 +362,7 @@ void __fastcall TfrmMain::RefreshImagesView()
     // display all the images types
     auto y = 8;
     DisplayImages("FONT", m_Font, y, m_Scale, 0);
+    DisplayMessasges("MESSAGES", y, m_Scale);
     DisplayImages("BLOCKS", m_Blocks, y, m_Scale, 1);
     DisplayImages("OBJECTS", m_Objects, y, m_Scale, 2);
     DisplayImages("SPRITES", m_Sprites, y, m_Scale, 3);
@@ -525,5 +591,18 @@ void __fastcall TfrmMain::imgViewMouseMove(TObject *Sender, TShiftState Shift, i
     }
 }
 //---------------------------------------------------------------------------
-
+void __fastcall TfrmMain::WMDropFiles(TWMDropFiles &message)
+{
+    TCHAR filename[MAX_PATH];
+    HDROP hDrop = (HDROP)message.Drop;
+    int numFiles = DragQueryFile(hDrop, -1, NULL, NULL);
+    if (numFiles > 0)
+    {
+        DragQueryFile(hDrop, 0, filename, sizeof(filename));
+        // process the file in 'buff'
+        OpenFile(String(filename));
+    }
+    DragFinish(hDrop);
+}
+//---------------------------------------------------------------------------
 

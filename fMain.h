@@ -23,6 +23,7 @@
 #include "Screen.h"
 #include "Map.h"
 #include "Window.h"
+#include <Vcl.Imaging.pngimage.hpp>
 //---------------------------------------------------------------------------
 class TfrmMain : public TForm
 {
@@ -60,19 +61,22 @@ __published:	// IDE-managed Components
     TAction *actToggleMonochrome;
     TScrollBox *sbxMap;
     TImage *imgMap;
+    TImage *imgZXFont;
+    void __fastcall FormResize(TObject *Sender);
+    void __fastcall FormCreate(TObject *Sender);
+    void __fastcall FormDestroy(TObject *Sender);
     void __fastcall actFileOpenAccept(TObject *Sender);
     void __fastcall actZoomInExecute(TObject *Sender);
     void __fastcall actZoomOutExecute(TObject *Sender);
     void __fastcall actZoomActualSizeExecute(TObject *Sender);
     void __fastcall actZoomToFitExecute(TObject *Sender);
-    void __fastcall FormResize(TObject *Sender);
-    void __fastcall FormCreate(TObject *Sender);
     void __fastcall actPlayExecute(TObject *Sender);
     void __fastcall actStopExecute(TObject *Sender);
+    void __fastcall actToggleMonochromeExecute(TObject *Sender);
     void __fastcall Timer1Timer(TObject *Sender);
     void __fastcall sbxViewMouseWheel(TObject *Sender, TShiftState Shift, int WheelDelta, TPoint &MousePos, bool &Handled);
-    void __fastcall actToggleMonochromeExecute(TObject *Sender);
     void __fastcall imgViewMouseMove(TObject *Sender, TShiftState Shift, int X, int Y);
+
 
 private:	// User declarations
     ImageList           m_Font;
@@ -81,6 +85,7 @@ private:	// User declarations
     ImageList           m_Sprites;
     ScreenList          m_Screens;
     Window              m_Window;
+    std::vector<String> m_Messages;
    std::unique_ptr<Map> m_Map;
     float               m_Scale;
     int                 m_Animate;
@@ -89,7 +94,12 @@ private:	// User declarations
     TPoint              m_ImageCursorPos;
     TSize               m_ImageCursorSize;
     TPoint              m_Cursor;
+    virtual void __fastcall WMDropFiles(TWMDropFiles &message);
+    BEGIN_MESSAGE_MAP
+    MESSAGE_HANDLER(WM_DROPFILES,TWMDropFiles,WMDropFiles);
+    END_MESSAGE_MAP (TForm);
 
+    void    __fastcall  OpenFile(const String& file);
     String  __fastcall  PreProcess(const String& data) const;
     void    __fastcall  Convert(const String& data);
     void    __fastcall  ConvertScreen(const String& data);
@@ -99,6 +109,8 @@ private:	// User declarations
     void    __fastcall  ConvertObject(const String& data);
     void    __fastcall  ConvertSprite(const String& data);
     void    __fastcall  ConvertFont(const String& data);
+    void    __fastcall  ConvertMessages(const String& data);
+    void    __fastcall  DisplayMessasges(const String& title, int& y, int scale);
     void    __fastcall  DisplayImages(const String& title, const ImageList& images, int& y, int scale, int index);
     void    __fastcall  RefreshImagesView();
     void    __fastcall  RefreshMapView();

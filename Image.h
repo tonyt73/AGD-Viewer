@@ -34,6 +34,7 @@ public:
     int         __fastcall  Draw(int x, int y, TBitmap* bitmap, int scalar, int frame = -1);
     void        __fastcall  SetAttribute(unsigned char attr);
     void        __fastcall  ResetAttribute();
+   virtual void __fastcall  Assign(TBitmap* bitmap);
 
     ImageType   __property  Type = { read = m_Type };
     String      __property  SubType = { read = m_SubType };
@@ -81,7 +82,10 @@ private:
 
 public:
         __fastcall  ImageFont(const String& data);
+        __fastcall  ImageFont(TBitmap* bitmap);
         __fastcall ~ImageFont();
+
+    int __fastcall  DrawChr(int x, int y, TBitmap* bitmap, int scalar, int character);
 };
 //---------------------------------------------------------------------------
 #endif
