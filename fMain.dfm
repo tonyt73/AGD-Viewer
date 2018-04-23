@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'AGDv'
-  ClientHeight = 670
-  ClientWidth = 983
+  ClientHeight = 899
+  ClientWidth = 994
   Color = clBtnFace
   DragMode = dmAutomatic
   Font.Charset = DEFAULT_CHARSET
@@ -3582,8 +3582,8 @@ object frmMain: TfrmMain
   TextHeight = 13
   object barStatus: TStatusBar
     Left = 0
-    Top = 651
-    Width = 983
+    Top = 880
+    Width = 994
     Height = 19
     Panels = <
       item
@@ -3609,12 +3609,14 @@ object frmMain: TfrmMain
       item
         Width = 50
       end>
+    ExplicitTop = 651
+    ExplicitWidth = 983
   end
   object pgcViews: TPageControl
     Left = 0
     Top = 40
-    Width = 983
-    Height = 611
+    Width = 994
+    Height = 666
     ActivePage = tabImages
     Align = alClient
     Font.Charset = ANSI_CHARSET
@@ -3626,27 +3628,34 @@ object frmMain: TfrmMain
     TabHeight = 40
     TabOrder = 1
     TabWidth = 120
+    ExplicitWidth = 983
+    ExplicitHeight = 611
     object tabImages: TTabSheet
       Caption = 'Images'
+      ExplicitWidth = 975
+      ExplicitHeight = 561
       object sbxView: TScrollBox
         Left = 0
         Top = 0
-        Width = 975
-        Height = 561
+        Width = 986
+        Height = 616
         VertScrollBar.Smooth = True
         VertScrollBar.Tracking = True
         Align = alClient
         BorderStyle = bsNone
         TabOrder = 0
         OnMouseWheel = sbxViewMouseWheel
+        ExplicitWidth = 975
+        ExplicitHeight = 561
         object imgView: TImage
           Left = 0
           Top = 0
-          Width = 975
+          Width = 986
           Height = 542
           Align = alTop
           OnMouseMove = imgViewMouseMove
           ExplicitTop = -2
+          ExplicitWidth = 975
         end
         object imgZXFont: TImage
           Left = 16
@@ -3695,11 +3704,13 @@ object frmMain: TfrmMain
     object tabMap: TTabSheet
       Caption = 'Map'
       ImageIndex = 1
+      ExplicitWidth = 975
+      ExplicitHeight = 706
       object sbxMap: TScrollBox
         Left = 0
         Top = 0
-        Width = 975
-        Height = 561
+        Width = 986
+        Height = 616
         HorzScrollBar.Smooth = True
         HorzScrollBar.Tracking = True
         VertScrollBar.Smooth = True
@@ -3708,6 +3719,8 @@ object frmMain: TfrmMain
         BorderStyle = bsNone
         TabOrder = 0
         OnMouseWheel = sbxViewMouseWheel
+        ExplicitWidth = 975
+        ExplicitHeight = 706
         object imgMap: TImage
           Left = 0
           Top = 0
@@ -3721,13 +3734,14 @@ object frmMain: TfrmMain
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 983
+    Width = 994
     Height = 40
     ButtonHeight = 40
     ButtonWidth = 40
     Images = ImageList1
     TabOrder = 2
     Wrapable = False
+    ExplicitWidth = 983
     object ToolButton1: TToolButton
       Left = 0
       Top = 0
@@ -3815,6 +3829,84 @@ object frmMain: TfrmMain
       Style = tbsCheck
     end
   end
+  object panReport: TPanel
+    Left = 0
+    Top = 706
+    Width = 994
+    Height = 174
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 3
+    Visible = False
+    ExplicitTop = 616
+    ExplicitWidth = 986
+    object Panel2: TPanel
+      Left = 0
+      Top = 0
+      Width = 994
+      Height = 35
+      Align = alTop
+      TabOrder = 0
+      ExplicitWidth = 986
+      object Label1: TLabel
+        Left = 1
+        Top = 1
+        Width = 959
+        Height = 33
+        Align = alClient
+        Caption = ' Report'
+        Layout = tlCenter
+        ExplicitWidth = 36
+        ExplicitHeight = 13
+      end
+      object SpeedButton1: TSpeedButton
+        Left = 960
+        Top = 1
+        Width = 33
+        Height = 33
+        Align = alRight
+        Flat = True
+        Glyph.Data = {
+          E6010000424DE60100000000000036000000280000000C0000000C0000000100
+          180000000000B0010000C40E0000C40E00000000000000000000DC00FFDC00FF
+          DC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00
+          FFDC00FF25002B25002BDC00FFDC00FFDC00FFDC00FFDC00FF25002B25002BDC
+          00FFDC00FFDC00FF25002B11001425002BDC00FFDC00FFDC00FF25002B110014
+          25002BDC00FFDC00FFDC00FFDC00FF25002B11001425002BDC00FF25002B1100
+          1425002BDC00FFDC00FFDC00FFDC00FFDC00FFDC00FF25002B1100141D002211
+          001425002BDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FF1D0022
+          0000001D0022DC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FF2500
+          2B1100141D002211001425002BDC00FFDC00FFDC00FFDC00FFDC00FFDC00FF25
+          002B11001425002BDC00FF25002B11001425002BDC00FFDC00FFDC00FFDC00FF
+          25002B11001425002BDC00FFDC00FFDC00FF25002B11001425002BDC00FFDC00
+          FFDC00FF25002B25002BDC00FFDC00FFDC00FFDC00FFDC00FF25002B25002BDC
+          00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FF
+          DC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00FFDC00
+          FFDC00FFDC00FFDC00FF}
+        OnClick = SpeedButton1Click
+        ExplicitLeft = 952
+      end
+    end
+    object memReport: TMemo
+      Left = 0
+      Top = 35
+      Width = 994
+      Height = 139
+      Align = alClient
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Courier New'
+      Font.Style = []
+      Lines.Strings = (
+        '')
+      ParentFont = False
+      ReadOnly = True
+      ScrollBars = ssBoth
+      TabOrder = 1
+      ExplicitWidth = 986
+    end
+  end
   object actionList: TActionList
     Images = ImageList1
     Left = 136
@@ -3897,7 +3989,7 @@ object frmMain: TfrmMain
     Left = 220
     Top = 147
     Bitmap = {
-      494C0101080068005C0020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010108006800640020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -1,57 +1,66 @@
 //---------------------------------------------------------------------------
 #include "agdv.pch.h"
 #include "Screen.h"
+#include "ErrorReporter.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 __fastcall GameScreen::GameScreen(const String& data)
 {
-    // convert the SPRITEPOSITION commands
-    auto sp = data.Pos("spriteposition");
-    auto sprites = sp != 0 ? data.SubString(sp, data.Length()) : "";
-    auto blocks = sp != 0 ? data.SubString(1, sp - 1) : data;
-    auto spTokens = SplitString(sprites.Trim(), " ");
-    String  prevToken = "";
-    SpritePosition spritePos;
-    int i = 0;
-    for (auto token : spTokens)
+    try
     {
-        token = token.Trim();
-        if (token != "")
+        // convert the SPRITEPOSITION commands
+        auto sp = data.Pos("spriteposition");
+        auto sprites = sp != 0 ? data.SubString(sp, data.Length()) : "";
+        auto blocks = sp != 0 ? data.SubString(1, sp - 1) : data;
+        auto spTokens = SplitString(sprites.Trim(), " ");
+        String  prevToken = "";
+        SpritePosition spritePos;
+        int i = 0;
+        for (auto token : spTokens)
         {
-            if (prevToken == "spriteposition")
+            token = token.Trim();
+            if (token != "")
             {
-                i = 1;
-                spritePos.Type = StrToInt(token);
+                if (prevToken == "spriteposition")
+                {
+                    i = 1;
+                    spritePos.Type = StrToInt(token);
+                }
+                else if (i == 1)
+                {
+                    spritePos.Index = StrToInt(token);
+                    i = 2;
+                }
+                else if (i == 2)
+                {
+                    spritePos.Position.Y = StrToInt(token);
+                    i = 3;
+                }
+                else if (i == 3)
+                {
+                    spritePos.Position.X = StrToInt(token);
+                    i = 0;
+                    m_Sprites.push_back(spritePos);
+                }
+                prevToken = token;
             }
-            else if (i == 1)
+        }
+
+        // Convert the block data
+        auto tokens = SplitString(blocks.Trim(), " ");
+        for (auto token : tokens)
+        {
+            if (token.Trim() != "")
             {
-                spritePos.Index = StrToInt(token);
-                i = 2;
+                m_Blocks.push_back(StrToInt(token.Trim()));
             }
-            else if (i == 2)
-            {
-                spritePos.Position.Y = StrToInt(token);
-                i = 3;
-            }
-            else if (i == 3)
-            {
-                spritePos.Position.X = StrToInt(token);
-                i = 0;
-                m_Sprites.push_back(spritePos);
-            }
-            prevToken = token;
         }
     }
-
-    // Convert the block data
-    auto tokens = SplitString(blocks.Trim(), " ");
-    for (auto token : tokens)
+    catch(...)
     {
-        if (token.Trim() != "")
-        {
-            m_Blocks.push_back(StrToInt(token.Trim()));
-        }
+        g_ErrorReporter.Add("Error: Exception caught while converting Scrren data. [" + data + "]");
+        throw;
     }
 }
 //---------------------------------------------------------------------------
@@ -81,7 +90,14 @@ void __fastcall GameScreen::Draw(int room, int x, int y, TBitmap* bitmap, int sc
 
     for (const auto& sprite : m_Sprites)
     {
-        sprites[sprite.Index]->Draw(sx + (sprite.Position.X * scalar), sy + (sprite.Position.Y * scalar), bitmap, scalar, 0);
+        if (sprite.Index < sprites.size())
+        {
+            sprites[sprite.Index]->Draw(sx + (sprite.Position.X * scalar), sy + (sprite.Position.Y * scalar), bitmap, scalar, 0);
+        }
+        else
+        {
+            g_ErrorReporter.Add("Error: Invalid Sprite index referenced in screen data. Room: " + IntToStr(room) + ", SpriteIndex: " + IntToStr(sprite.Index));
+        }
     }
 
     for (const auto& object : objects)

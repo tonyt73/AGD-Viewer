@@ -1,6 +1,7 @@
 //---------------------------------------------------------------------------
 #include "agdv.pch.h"
 #include "Image.h"
+#include "ErrorReporter.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
@@ -9,40 +10,49 @@ int g_File = 1;
 __fastcall Image::Image(ImageType type, const String& data)
 : m_ScalarX(1)
 , m_Frames(1)
+, m_Attribute(0x47)
 , m_Palette(mpZXSpectrum)
 {
-    m_Bitmap = std::make_unique<TBitmap>();
-    m_Bitmap->PixelFormat = pf32bit;
-    // create an empty type of image
-    switch (type)
+    try
     {
-        case itBlock:
-            m_Bitmap->Width = 8;
-            m_Bitmap->Height = 8;
-            break;
-        case itObject:
-            m_Bitmap->Width = 16;
-            m_Bitmap->Height = 16;
-            break;
-        case itSprite:
-            m_Bitmap->Width = 16;
-            m_Bitmap->Height = 16;
-            break;
-        case itFont:
-            m_Bitmap->Width = 8;
-            m_Bitmap->Height = 8;
-            break;
-    }
-    m_Width = m_Bitmap->Width;
-    m_Height = m_Bitmap->Height;
-    // convert the data string to a bitmap data list
-    auto tokens = SplitString(data.Trim(), " ");
-    for (auto token : tokens)
-    {
-        if (token.Trim() != "")
+        m_Bitmap = std::make_unique<TBitmap>();
+        m_Bitmap->PixelFormat = pf32bit;
+        // create an empty type of image
+        switch (type)
         {
-            m_BitmapData.push_back(StrToInt(token.Trim()));
+            case itBlock:
+                m_Bitmap->Width = 8;
+                m_Bitmap->Height = 8;
+                break;
+            case itObject:
+                m_Bitmap->Width = 16;
+                m_Bitmap->Height = 16;
+                break;
+            case itSprite:
+                m_Bitmap->Width = 16;
+                m_Bitmap->Height = 16;
+                break;
+            case itFont:
+                m_Bitmap->Width = 8;
+                m_Bitmap->Height = 8;
+                break;
         }
+        m_Width = m_Bitmap->Width;
+        m_Height = m_Bitmap->Height;
+        // convert the data string to a bitmap data list
+        auto tokens = SplitString(data.Trim(), " ");
+        for (auto token : tokens)
+        {
+            if (token.Trim() != "")
+            {
+                m_BitmapData.push_back(StrToInt(token.Trim()));
+            }
+        }
+    }
+    catch(...)
+    {
+        g_ErrorReporter.Add("Error: Exception caught while converting Image data. [" + data + "]");
+        throw;
     }
 }
 //---------------------------------------------------------------------------
@@ -353,33 +363,7 @@ __fastcall ImageFont::ImageFont(const String& data)
 {
     m_Frames = 1;
     m_Bitmap->Width = m_Bitmap->Width * 96;
-    auto size = m_BitmapData.size();
-    auto frame_size = size / 96;
-
-    auto idx = 0;
-    auto offset = 0;
-    BitmapData bitmapData;
-    for (auto f = 0; f < 96; f++)
-    {
-        bitmapData.clear();
-        for (auto i = 0; i < frame_size; i++)
-        {
-            bitmapData.push_back(m_BitmapData[idx++]);
-        }
-        switch (frame_size)
-        {
-            case 8:    // ZX Spectrum
-                DrawSpectrum(bitmapData, 0x47, offset);
-                break;
-            case 24:
-                m_Width = 6;
-                m_Bitmap->Width = (m_Width + 1) * m_Frames;
-                DrawAmstradCPC(bitmapData, offset);
-                break;
-
-        }
-        offset += m_Width;
-    }
+    DrawCharacterSet(m_Attribute);
 }
 //---------------------------------------------------------------------------
 __fastcall ImageFont::~ImageFont()
@@ -394,11 +378,59 @@ __fastcall ImageFont::ImageFont(TBitmap* bitmap)
     BitBlt(m_Bitmap->Canvas->Handle, 0, 0, m_Bitmap->Width, m_Bitmap->Height, bitmap->Canvas->Handle, 0, 0, SRCCOPY);
 }
 //---------------------------------------------------------------------------
+void __fastcall ImageFont::DrawCharacterSet(unsigned char attr)
+{
+    if (m_BitmapData.size() == 0) return;
+
+    auto size = m_BitmapData.size();
+    auto frame_size = size / 96;
+    auto idx = 0;
+    auto offset = 0;
+    BitmapData bitmapData;
+    for (auto f = 0; f < 96; f++)
+    {
+        bitmapData.clear();
+        for (auto i = 0; i < frame_size; i++)
+        {
+            bitmapData.push_back(m_BitmapData[idx++]);
+        }
+        switch (frame_size)
+        {
+            case 8:     // ZX Spectrum
+                DrawSpectrum(bitmapData, attr, offset);
+                break;
+            case 24:    // Amstrad CPC
+                m_Width = 6;
+                m_Bitmap->Width = (m_Width + 1) * m_Frames;
+                DrawAmstradCPC(bitmapData, offset);
+                break;
+
+        }
+        offset += m_Width;
+    }
+}
+//---------------------------------------------------------------------------
 int __fastcall ImageFont::DrawChr(int x, int y, TBitmap* bitmap, int scalar, int character)
 {
     int w = m_Width * scalar * ScalarX;
     ::StretchBlt(bitmap->Canvas->Handle, x, y, w, m_Bitmap->Height * scalar, m_Bitmap->Canvas->Handle, m_Width * character, 0, m_Width, m_Bitmap->Height, SRCCOPY);
     return w;
+}
+//---------------------------------------------------------------------------
+void __fastcall ImageFont::SetAttribute(unsigned char attr)
+{
+    if (m_Palette == mpZXSpectrum)
+    {
+        DrawCharacterSet(attr);
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall ImageFont::ResetAttribute()
+{
+    if (m_Palette == mpZXSpectrum)
+    {
+        DrawCharacterSet(m_Attribute);
+    }
 }
 //---------------------------------------------------------------------------
 

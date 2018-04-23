@@ -24,6 +24,7 @@
 #include "Map.h"
 #include "Window.h"
 #include <Vcl.Imaging.pngimage.hpp>
+#include <Vcl.Buttons.hpp>
 //---------------------------------------------------------------------------
 class TfrmMain : public TForm
 {
@@ -63,6 +64,11 @@ __published:	// IDE-managed Components
     TImage *imgMap;
     TImage *imgZXFont;
     TTimer *Timer2;
+    TPanel *panReport;
+    TMemo *memReport;
+    TLabel *Label1;
+    TPanel *Panel2;
+    TSpeedButton *SpeedButton1;
     void __fastcall FormResize(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
     void __fastcall FormDestroy(TObject *Sender);
@@ -80,6 +86,7 @@ __published:	// IDE-managed Components
     void __fastcall FormActivate(TObject *Sender);
     void __fastcall Timer2Timer(TObject *Sender);
     void __fastcall FormDeactivate(TObject *Sender);
+    void __fastcall SpeedButton1Click(TObject *Sender);
 
 
 private:	// User declarations

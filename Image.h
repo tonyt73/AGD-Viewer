@@ -26,14 +26,13 @@ protected:
     void        __fastcall  DrawSpectrumNext(const BitmapData& data, int offset = 0);
     void        __fastcall  DrawAmstradCPC(const BitmapData& data, int offset = 0);
 
-
 public:
                 __fastcall  Image(ImageType type, const String& data);
     virtual     __fastcall ~Image();
                             // draw bitmap onto image - return width of image drawn adjusted for scaling
     int         __fastcall  Draw(int x, int y, TBitmap* bitmap, int scalar, int frame = -1);
-    void        __fastcall  SetAttribute(unsigned char attr);
-    void        __fastcall  ResetAttribute();
+   virtual void __fastcall  SetAttribute(unsigned char attr);
+   virtual void __fastcall  ResetAttribute();
    virtual void __fastcall  Assign(TBitmap* bitmap);
 
     ImageType   __property  Type = { read = m_Type };
@@ -79,6 +78,9 @@ public:
 class ImageFont : public Image
 {
 private:
+    void __fastcall DrawCharacterSet(unsigned char attr);
+    void __fastcall SetAttribute(unsigned char attr);
+    void __fastcall ResetAttribute();
 
 public:
         __fastcall  ImageFont(const String& data);

@@ -1,32 +1,39 @@
 //---------------------------------------------------------------------------
 #include "agdv.pch.h"
-#pragma hdrstop
-//---------------------------------------------------------------------------
 #include "Map.h"
+#include "ErrorReporter.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 //---------------------------------------------------------------------------
 __fastcall Map::Map(const String& data)
 {
-    auto tokens = SplitString(data.Trim(), " ");
-    String prevToken;
-    auto storeScreens = false;
-    for (auto token : tokens)
+    try
     {
-        if (prevToken == "width")
+        auto tokens = SplitString(data.Trim(), " ");
+        String prevToken;
+        auto storeScreens = false;
+        for (auto token : tokens)
         {
-            m_Width = StrToInt(token.Trim());
+            if (prevToken == "width")
+            {
+                m_Width = StrToInt(token.Trim());
+            }
+            else if (prevToken == "startscreen")
+            {
+                m_StartScreen = StrToInt(token.Trim());
+                storeScreens = true;
+            }
+            else if (storeScreens && token.Trim() != "")
+            {
+                m_MapData.push_back(StrToInt(token.Trim()));
+            }
+            prevToken = token.Trim();
         }
-        else if (prevToken == "startscreen")
-        {
-            m_StartScreen = StrToInt(token.Trim());
-            storeScreens = true;
-        }
-        else if (storeScreens && token.Trim() != "")
-        {
-            m_MapData.push_back(StrToInt(token.Trim()));
-        }
-        prevToken = token.Trim();
+    }
+    catch(...)
+    {
+        g_ErrorReporter.Add("Error: Exception caught while converting Map data: [" + data + "]");
+        throw;
     }
 }
 //---------------------------------------------------------------------------
