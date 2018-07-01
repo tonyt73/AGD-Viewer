@@ -10,7 +10,8 @@ __fastcall GameScreen::GameScreen(const String& data)
     try
     {
         // convert the SPRITEPOSITION commands
-        auto sp = data.Pos("spriteposition");
+        auto ld = data.LowerCase();
+        auto sp = ld.Pos("spriteposition");
         auto sprites = sp != 0 ? data.SubString(sp, data.Length()) : "";
         auto blocks = sp != 0 ? data.SubString(1, sp - 1) : data;
         auto spTokens = SplitString(sprites.Trim(), " ");
@@ -22,7 +23,7 @@ __fastcall GameScreen::GameScreen(const String& data)
             token = token.Trim();
             if (token != "")
             {
-                if (prevToken == "spriteposition")
+                if (prevToken.LowerCase() == "spriteposition")
                 {
                     i = 1;
                     spritePos.Type = StrToInt(token);

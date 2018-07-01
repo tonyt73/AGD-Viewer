@@ -60,6 +60,11 @@ __fastcall Image::~Image()
 {
 }
 //---------------------------------------------------------------------------
+void __fastcall Image::GetBitmapData(BitmapData& data) const
+{
+    data = m_BitmapData;
+}
+//---------------------------------------------------------------------------
 int __fastcall Image::Draw(int x, int y, TBitmap* bitmap, int scalar, int frame)
 {
     if (frame == -1 || m_Frames == 1)
@@ -282,11 +287,11 @@ __fastcall ImageObject::ImageObject(const String& data)
 , m_Position(0,0)
 {
     auto size = m_BitmapData.size();
-    m_Attribute = 0x47;
+    m_Attribute = 0x47; // White on Black
     switch (size)
     {
         case 36: // ZX Spectrum
-            m_Attribute = m_BitmapData.front(); // White on Black
+            m_Attribute = m_BitmapData.front();
             m_BitmapData.erase(m_BitmapData.begin());
         case 35: // ZX Spectrum Next/Timex/Monochrome
             m_Room = m_BitmapData.front();
@@ -316,17 +321,14 @@ __fastcall ImageObject::~ImageObject()
 __fastcall ImageSprite::ImageSprite(const String& data)
 : Image(itSprite, data)
 {
-    m_Attribute = 0x47;
+    m_Attribute = 0x47; // White on Black
     m_Frames = m_BitmapData.front();
     m_BitmapData.erase(m_BitmapData.begin());
     m_Bitmap->Width = m_Bitmap->Width * m_Frames;
     auto size = m_BitmapData.size();
     auto frame_size = size / m_Frames;
-    if (frame_size == 48)
-    {
-        m_Bitmap->Height = 24;
-    }
-
+    m_Height = frame_size / 2;
+    m_Bitmap->Height = m_Height;
     auto idx = 0;
     auto offset = 0;
     BitmapData bitmapData;

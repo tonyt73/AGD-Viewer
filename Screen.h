@@ -16,12 +16,15 @@ typedef std::vector<SpritePosition> Sprites;
 class GameScreen
 {
 private:
+
+public:
     ScreenData          m_Blocks;
     Sprites             m_Sprites;
 
-public:
             __fastcall  GameScreen(const String& data);
     void    __fastcall  Draw(int room, int x, int y, TBitmap* bitmap, int scalar, const ImageList& blocks, const ImageList& objects, const ImageList& sprites, const Window& window);
+
+
 };
 //---------------------------------------------------------------------------
 typedef std::vector<std::unique_ptr<GameScreen>> ScreenList;

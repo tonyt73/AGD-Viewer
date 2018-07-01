@@ -69,6 +69,20 @@ __published:	// IDE-managed Components
     TLabel *Label1;
     TPanel *Panel2;
     TSpeedButton *SpeedButton1;
+    TAction *actExport;
+    TToolButton *btnExport;
+    TToolButton *ToolButton12;
+    TTabSheet *Events;
+    TMemo *memEvents;
+    TTabSheet *TabSheet1;
+    TMemo *memMessages;
+    TPopupMenu *popExports;
+    TMenuItem *ExporttoAGDXStudioProject1;
+    TMenuItem *AGDFile1;
+    TMenuItem *Custom1;
+    TAction *actExportAGDX;
+    TAction *actExportAGD;
+    TAction *actExportCustom;
     void __fastcall FormResize(TObject *Sender);
     void __fastcall FormCreate(TObject *Sender);
     void __fastcall FormDestroy(TObject *Sender);
@@ -87,8 +101,10 @@ __published:	// IDE-managed Components
     void __fastcall Timer2Timer(TObject *Sender);
     void __fastcall FormDeactivate(TObject *Sender);
     void __fastcall SpeedButton1Click(TObject *Sender);
-
-
+    void __fastcall actExportExecute(TObject *Sender);
+    void __fastcall actExportAGDXExecute(TObject *Sender);
+    void __fastcall actExportAGDExecute(TObject *Sender);
+    void __fastcall actExportCustomExecute(TObject *Sender);
 private:	// User declarations
     ImageList           m_Font;
     ImageList           m_Blocks;
@@ -96,6 +112,7 @@ private:	// User declarations
     ImageList           m_Sprites;
     ScreenList          m_Screens;
     Window              m_Window;
+    std::vector<String> m_Events;
     std::vector<String> m_Messages;
    std::unique_ptr<Map> m_Map;
     float               m_Scale;
@@ -106,7 +123,7 @@ private:	// User declarations
     TSize               m_ImageCursorSize;
     TPoint              m_Cursor;
     String              m_File;
-
+    String              m_EventCode;
 
     virtual void __fastcall WMDropFiles(TWMDropFiles &message);
     BEGIN_MESSAGE_MAP
@@ -114,6 +131,9 @@ private:	// User declarations
     END_MESSAGE_MAP (TForm);
 
     void    __fastcall  OpenFile(const String& file);
+    void    __fastcall  LoadAGDFile(const String& file);
+    void    __fastcall  ImportSnapshot(const String& file);
+    void    __fastcall  Export();
     String  __fastcall  PreProcess(const String& data) const;
     void    __fastcall  Convert(const String& data);
     void    __fastcall  ConvertScreen(const String& data);
@@ -124,10 +144,15 @@ private:	// User declarations
     void    __fastcall  ConvertSprite(const String& data);
     void    __fastcall  ConvertFont(const String& data);
     void    __fastcall  ConvertMessages(const String& data);
+    void    __fastcall  ConvertEventCode();
     void    __fastcall  DisplayMessasges(const String& title, int& y, int scale);
     void    __fastcall  DisplayImages(const String& title, const ImageList& images, int& y, int scale, int index);
     void    __fastcall  RefreshImagesView();
     void    __fastcall  RefreshMapView();
+
+    void    __fastcall  ExportAGDXProject();
+    void    __fastcall  ExportAGDFile();
+    void    __fastcall  ExportCustom();
 
 public:		// User declarations
             __fastcall  TfrmMain(TComponent* Owner);

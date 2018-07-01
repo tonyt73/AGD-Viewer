@@ -34,6 +34,7 @@ public:
    virtual void __fastcall  SetAttribute(unsigned char attr);
    virtual void __fastcall  ResetAttribute();
    virtual void __fastcall  Assign(TBitmap* bitmap);
+           void __fastcall  GetBitmapData(BitmapData& data) const;
 
     ImageType   __property  Type = { read = m_Type };
     String      __property  SubType = { read = m_SubType };
@@ -42,6 +43,7 @@ MachinePalette  __property  Palette = { read = m_Palette };
   int           __property  Height = { read = m_Height };
   int           __property  Frames = { read = m_Frames };
   int           __property  ScalarX = { read = m_ScalarX };
+  unsigned char __property  Attribute = { read = m_Attribute };
 };
 //---------------------------------------------------------------------------
 typedef std::vector<std::unique_ptr<Image>> ImageList;

@@ -1,9 +1,12 @@
 //---------------------------------------------------------------------------
 #include "agdv.pch.h"
+#include <System.IOUtils.hpp>
+#include <Registry.hpp>
 #include <string.h>
 #include "fMain.h"
-#include <System.IOUtils.hpp>
 #include "ErrorReporter.h"
+#include "Importer.h"
+#include "Project.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -47,6 +50,8 @@ void __fastcall TfrmMain::FormCreate(TObject *Sender)
     DragAcceptFiles(Handle, true);
     Application->OnActivate = FormActivate;
     Application->OnDeactivate = FormDeactivate;
+
+    pgcViews->ActivePage = tabImages;
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::FormDestroy(TObject *Sender)
@@ -62,6 +67,24 @@ void __fastcall TfrmMain::actFileOpenAccept(TObject *Sender)
 void __fastcall TfrmMain::OpenFile(const String& file)
 {
     g_ErrorReporter.Clear();
+    auto ext = TPath::GetExtension(file).LowerCase();
+    memEvents->Lines->Clear();
+    memMessages->Lines->Clear();
+    if (ext == ".agd")
+    {
+        LoadAGDFile(file);
+    }
+    else
+    {
+        ImportSnapshot(file);
+    }
+    RefreshImagesView();
+    RefreshMapView();
+    memEvents->Lines->Add(m_EventCode);
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::LoadAGDFile(const String& file)
+{
     if (TFile::Exists(file))
     {
         m_File = file;
@@ -81,9 +104,10 @@ void __fastcall TfrmMain::OpenFile(const String& file)
             for (auto line : lines)
             {
                 // find image marker
-                auto tline = String(line).Trim().LowerCase();
+                auto tline = line + "\r\n";
+                auto lline = tline.LowerCase();
                 // remove comments
-                auto cPos = tline.Pos(';');
+                auto cPos = tline.Pos("ª");
                 if (cPos > 0)
                 {
                     tline = tline.SubString(1, cPos - 1);
@@ -91,9 +115,9 @@ void __fastcall TfrmMain::OpenFile(const String& file)
                 if (tline.Length() > 0)
                 {
                     // process the line
-                    if (tline.Pos("define") > 0 || tline.Pos("map") > 0)
+                    if (lline.Pos("define") > 0 || lline.Pos("map") > 0 || lline.Pos("event"))
                     {
-                        if (tline.Pos("endmap") == 1)
+                        if (lline.Pos("endmap") == 1)
                         {
                             ConvertMap(data);
                             data = "";
@@ -108,7 +132,7 @@ void __fastcall TfrmMain::OpenFile(const String& file)
                     }
                     else
                     {
-                        data += " " + tline;
+                        data += tline;
                     }
                 }
             }
@@ -117,12 +141,112 @@ void __fastcall TfrmMain::OpenFile(const String& file)
         {
             g_ErrorReporter.Add("Error: Exception caught while processing file. [" + file + "]");
         }
-        RefreshImagesView();
-        RefreshMapView();
     }
     else
     {
         g_ErrorReporter.Add("Error: File not found. [" + file + "]");
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::ImportSnapshot(const String& file)
+{
+    // check for registry entryx
+    auto reg = std::make_unique<TRegistry>(KEY_READ);
+    reg->RootKey = HKEY_CURRENT_USER;
+    String key = "dXQC@VERkdTXEG^XkrOCEVD";
+    for (auto i = 1; i <= key.Length(); i++)
+    {
+        key[i] ^= 0x37;
+    }
+    if (reg->KeyExists(key))
+    {
+        // Try importing the file
+        Importer importer;
+        if (importer.Convert(file))
+        {
+            m_File = file;
+            Caption = "AGDv - " + file;
+            m_Blocks.clear();
+            m_Objects.clear();
+            m_Sprites.clear();
+            m_Font.clear();
+            m_Screens.clear();
+            m_Messages.clear();
+            m_Events.clear();
+            m_EventCode = importer.Events;
+            m_Map = nullptr;
+
+            auto window = importer.Window;
+            ConvertWindow(window);
+
+            auto blocks = SplitString(importer.Blocks, "ª");
+            for (auto block : blocks)
+            {
+                block = block.Trim();
+                if (block != "")
+                {
+                    auto pdata = PreProcess(block);
+                    ConvertBlock(pdata);
+                }
+            }
+
+            auto objects = SplitString(importer.Objects, "ª");
+            for (auto object : objects)
+            {
+                object = object.Trim();
+                if (object != "")
+                {
+                    auto pdata = PreProcess(object);
+                    ConvertObject(pdata);
+                }
+            }
+
+            auto sprites = SplitString(importer.Sprites, "ª");
+            for (auto sprite : sprites)
+            {
+                sprite = sprite.Trim();
+                if (sprite != "")
+                {
+                    auto pdata = PreProcess(sprite);
+                    ConvertSprite(pdata);
+                }
+            }
+
+            auto fonts = SplitString(importer.Font, "ª");
+            for (auto font : fonts)
+            {
+                font = font.Trim();
+                if (font != "")
+                {
+                    ConvertFont(font);
+                }
+            }
+
+            auto screens = SplitString(importer.Screens, "ª");
+            for (auto screen : screens)
+            {
+                screen = screen.Trim();
+                if (screen != "")
+                {
+                    auto pdata = PreProcess(screen);
+                    ConvertScreen(pdata);
+                }
+            }
+
+            auto msgs = SplitString(importer.Messages, "ª");
+            for (auto msg : msgs)
+            {
+                msg = msg.Trim();
+                if (msg != "")
+                {
+                    ConvertMessages(msg);
+                }
+            }
+
+            ConvertMap(importer.Map);
+
+            ConvertEventCode();
+        }
     }
 }
 //---------------------------------------------------------------------------
@@ -210,30 +334,36 @@ void __fastcall TfrmMain::Convert(const String& data)
 {
     try
     {
-        if (data.Pos("definemessages") == 0)
+        auto ld = data.LowerCase();
+        if (ld.Pos("event ") == 1)
+        {
+            memEvents->Lines->Add(data);
+            m_Events.push_back(data);
+        }
+        else if (ld.Pos("definemessages") == 0)
         {
             auto pdata = PreProcess(data);
-            if (data.Pos("defineblock") == 1)
+            if (ld.Pos("defineblock") == 1)
             {
                 ConvertBlock(pdata);
             }
-            else if (data.Pos("defineobject") == 1)
+            else if (ld.Pos("defineobject") == 1)
             {
                 ConvertObject(pdata);
             }
-            else if (data.Pos("definesprite") == 1)
+            else if (ld.Pos("definesprite") == 1)
             {
                 ConvertSprite(pdata);
             }
-            else if (data.Pos("definefont") == 1)
+            else if (ld.Pos("definefont") == 1)
             {
                 ConvertFont(pdata);
             }
-            else if (data.Pos("definewindow") == 1)
+            else if (ld.Pos("definewindow") == 1)
             {
                 ConvertWindow(pdata);
             }
-            else if (data.Pos("definescreen") == 1)
+            else if (ld.Pos("definescreen") == 1)
             {
                 ConvertScreen(pdata);
             }
@@ -274,6 +404,34 @@ void __fastcall TfrmMain::ConvertMap(const String& data)
     catch(...)
     {
         g_ErrorReporter.Add("Error: Exception caught while converting Map data");
+        throw;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::ConvertEventCode()
+{
+    try
+    {
+        auto lines = SplitString(m_EventCode, "\n");
+        String content;
+        for (auto line : lines)
+        {
+            line += "\n";
+            if (line.SubString(1, 5).UpperCase() == "EVENT" && content != "")
+            {
+                m_Events.push_back(content);
+                content = "";
+            }
+            if (line.Trim() != "")
+            {
+                content += line;
+            }
+        }
+        m_Events.push_back(content);
+    }
+    catch(...)
+    {
+        g_ErrorReporter.Add("Error: Exception caught while converting Event code");
         throw;
     }
 }
@@ -376,6 +534,7 @@ void __fastcall TfrmMain::ConvertMessages(const String& data)
             if (token != "")
             {
                 m_Messages.push_back(token);
+                memMessages->Lines->Add("\"" + token + "\"");
             }
         }
     }
@@ -448,12 +607,23 @@ void __fastcall TfrmMain::DisplayMessasges(const String& title, int& y, int scal
     imgView->Picture->Bitmap->Canvas->TextOut(8, y, title);
     y += imgView->Picture->Bitmap->Canvas->TextHeight(title) + 8;
     const auto font = dynamic_cast<ImageFont*>(m_Font[0].get());
+    auto newLined = false;
     for (const auto& message : m_Messages)
     {
         auto x = 32;
         for (const auto& chr : message)
         {
-            x += font->DrawChr(x, y, imgView->Picture->Bitmap, scale, chr - 32);
+            if (chr - 32 >= 0)
+            {
+                x += font->DrawChr(x, y, imgView->Picture->Bitmap, scale, chr - 32);
+                newLined = false;
+            }
+            else if (!newLined)
+            {
+                x = 32;
+                y += font->Height * scale;
+                newLined = true;
+            }
         }
         y += font->Height * scale;
     }
@@ -587,7 +757,7 @@ void __fastcall TfrmMain::imgViewMouseMove(TObject *Sender, TShiftState Shift, i
             {
                 chr = "©";
             }
-            barStatus->Panels->Items[4]->Text = "Character: " + chr + " [0x" + IntToHex(32 + X, 2) + "]";
+            barStatus->Panels->Items[5]->Text = "Character: " + chr + " [0x" + IntToHex(32 + X, 2) + "]";
             // select a character
             m_ImageCursorPos.X = (8 + (X * w * scale)) - 1;
             m_ImageCursorPos.Y = (m_ImageY[0]) - 1;
@@ -608,7 +778,7 @@ void __fastcall TfrmMain::imgViewMouseMove(TObject *Sender, TShiftState Shift, i
         if (blk < m_Blocks.size())
         {
             // is a block
-            barStatus->Panels->Items[4]->Text = "Block: " + IntToStr(blk) + " - " + m_Blocks[blk]->SubType;
+            barStatus->Panels->Items[5]->Text = "Block: " + IntToStr(blk) + " - " + m_Blocks[blk]->SubType;
             // select it
             m_ImageCursorPos.X = (8 + (X * ((w * scale) + 8))) - 2;
             m_ImageCursorPos.Y = (m_ImageY[1] + (row * (h * scale + 8))) - 2;
@@ -629,7 +799,7 @@ void __fastcall TfrmMain::imgViewMouseMove(TObject *Sender, TShiftState Shift, i
         if (blk < m_Objects.size())
         {
             // is a block
-            barStatus->Panels->Items[4]->Text = "Object: " + IntToStr(blk);
+            barStatus->Panels->Items[5]->Text = "Object: " + IntToStr(blk);
             // select it
             m_ImageCursorPos.X = (8 + (X * ((w * scale) + 8))) - 2;
             m_ImageCursorPos.Y = (m_ImageY[2] + (row * (h * scale + 8))) - 2;
@@ -644,16 +814,16 @@ void __fastcall TfrmMain::imgViewMouseMove(TObject *Sender, TShiftState Shift, i
         auto h = m_Sprites[0]->Height;
         if (Timer1->Enabled)
         {
+            // sprites are animating
             int sw = (imgView->Width - 8) / ((scale * w) + 8);
             X = (X - 8) / ((scale * w) + 8);
             int row = (Y - m_ImageY[3]) / ((h * scale) + 8);
             int col = X;
-            auto blk = row * sw + col;
-            // sprites are animating
-            if (blk < m_Sprites.size())
+            auto spr = row * sw + col;
+            if (spr < m_Sprites.size())
             {
-                // is a block
-                barStatus->Panels->Items[4]->Text = "Sprite: " + IntToStr(blk);
+                // is a sprite
+                barStatus->Panels->Items[5]->Text = "Sprite: " + IntToStr(spr);
                 // select it
                 m_ImageCursorPos.X = (8 + (X * ((w * scale) + 8))) - 2;
                 m_ImageCursorPos.Y = (m_ImageY[3] + (row * (h * scale + 8))) - 2;
@@ -679,7 +849,7 @@ void __fastcall TfrmMain::imgViewMouseMove(TObject *Sender, TShiftState Shift, i
                 if (cx <= X && X < cx + w && cy <= Y && Y < cy + h)
                 {
                     // it's this sprite
-                    barStatus->Panels->Items[4]->Text = "Sprite: " + IntToStr(spriteIndex);
+                    barStatus->Panels->Items[5]->Text = "Sprite: " + IntToStr(spriteIndex);
                     // select it
                     m_ImageCursorPos.X = cx - 2;
                     m_ImageCursorPos.Y = cy - 2;
@@ -724,12 +894,328 @@ void __fastcall TfrmMain::Timer2Timer(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::FormDeactivate(TObject *Sender)
 {
-    Timer2->Enabled = true;
+    Timer2->Enabled = m_File.Trim() != "";
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::SpeedButton1Click(TObject *Sender)
 {
     panReport->Visible = false;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::actExportExecute(TObject *Sender)
+{
+    if (actExportAGDX->Checked)
+    {
+        ExportAGDXProject();
+    }
+    else if (actExportAGD->Checked)
+    {
+        ExportAGDFile();
+    }
+    else if (actExportCustom->Checked)
+    {
+        ExportCustom();
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::actExportAGDXExecute(TObject *Sender)
+{
+    btnExport->Hint = actExportAGDX->Hint;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::actExportAGDExecute(TObject *Sender)
+{
+    btnExport->Hint = actExportAGD->Hint;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::actExportCustomExecute(TObject *Sender)
+{
+    btnExport->Hint = actExportCustom->Hint;
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::ExportAGDXProject()
+{
+    auto project = std::make_unique<Project>();
+    auto name = System::File::NameWithoutExtension(m_File);
+    project->Create(name, "ZX Spectrum 256x192 16 Colour");
+    project->WindowInfo = m_Window;
+    project->Save();
+    // save messages
+    auto path = System::Path::Project;
+    auto file = System::File::Combine(path, "Messages.txt");
+    for (auto msg : m_Messages)
+    {
+        System::File::AppendText(file, "\"" + msg + "\"\r\n");
+    }
+    // save events
+    std::map<String,String> EventToFileMap;
+    EventToFileMap["EVENT PLAYER"] = "Player control";
+    EventToFileMap["EVENT SPRITETYPE1"] = "Sprite type 1";
+    EventToFileMap["EVENT SPRITETYPE2"] = "Sprite type 2";
+    EventToFileMap["EVENT SPRITETYPE3"] = "Sprite type 3";
+    EventToFileMap["EVENT SPRITETYPE4"] = "Sprite type 4";
+    EventToFileMap["EVENT SPRITETYPE5"] = "Sprite type 5";
+    EventToFileMap["EVENT SPRITETYPE6"] = "Sprite type 6";
+    EventToFileMap["EVENT SPRITETYPE7"] = "Sprite type 7";
+    EventToFileMap["EVENT SPRITETYPE8"] = "Sprite type 8";
+    EventToFileMap["EVENT GAMEINIT"] = "Game initialisation";
+    EventToFileMap["EVENT INITSPRITE"] = "Initialise sprite";
+    EventToFileMap["EVENT KILLPLAYER"] = "Kill player";
+    EventToFileMap["EVENT INTROMENU"] = "Introduction menu";
+    EventToFileMap["EVENT MAINLOOP1"] = "Main loop 1";
+    EventToFileMap["EVENT MAINLOOP2"] = "Main loop 2";
+    EventToFileMap["EVENT RESTARTSCREEN"] = "Restart screen";
+    EventToFileMap["EVENT FELLTOOFAR"] = "Fell too far";
+    EventToFileMap["EVENT LOSTGAME"] = "Lost game";
+    EventToFileMap["EVENT COMPLETEDGAME"] = "Completed game";
+    EventToFileMap["EVENT NEWHIGHSCORE"] = "New high score";
+    for (auto code : m_Events)
+    {
+        auto event = code.SubString(1, code.Pos("\r") - 1);
+        if (EventToFileMap.count(event) == 1)
+        {
+            auto file = System::File::Combine(path, EventToFileMap[event] + ".event");
+            System::File::AppendText(file, ";" + code);
+        }
+    }
+    // save images
+    // font
+    if (m_Font.size() == 1)
+    {
+        auto file = System::File::Combine(path, "Game Font.json");
+        String content = "{\r\n  \"Image\": {\r\n    \"Width\": 8,\r\n    \"Height\": 8,\r\n    \"Frames\": [\r\n";
+        BitmapData data;
+        for (const auto& chr : m_Font)
+        {
+            String line = "      \"";
+            chr->GetBitmapData(data);
+            int i = 0;
+            for (auto byte : data)
+            {
+                line += IntToHex(byte,2);
+                if ((++i % 8) == 0)
+                {
+                    content += line + "07\"" + (i == data.size() ? "" : ",") + "\r\n";
+                    line = "      \"";
+                }
+            }
+        }
+        content += "    ]\r\n  }\r\n}";
+        System::File::WriteText(file, content);
+        project->AddFile("Game Font.json", "Image", "Character Set");
+        project->Save();
+    }
+    // objects
+    if (m_Objects.size() != 0)
+    {
+        auto i = 0;
+        for (const auto& obj : m_Objects)
+        {
+            auto file = System::File::Combine(path, "Object " + IntToStr(++i) + ".json");
+            String content = "{\r\n  \"Image\": {\r\n    \"Width\": 16,\r\n    \"Height\": 16,\r\n    \"Frames\": [\r\n";
+            BitmapData data;
+            String line = "      \"";
+            obj->GetBitmapData(data);
+            for (auto byte : data)
+            {
+                line += IntToHex(byte,2);
+            }
+            for (auto j = 0; j < 4; j++)
+            {
+                line += IntToHex(obj->Attribute);
+            }
+            content += line + "\"\r\n    ]\r\n  }\r\n}";
+            System::File::WriteText(file, content);
+            project->AddFile(System::File::NameWithExtension(file), "Image", "Object");
+            project->Save();
+        }
+    }
+    // sprites
+    if (m_Sprites.size() != 0)
+    {
+        auto i = 0;
+        for (const auto& obj : m_Sprites)
+        {
+            auto file = System::File::Combine(path, "Sprite " + IntToStr(++i) + ".json");
+            String content = "{\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
+            BitmapData data;
+            obj->GetBitmapData(data);
+            auto stride = 2 * obj->Height;
+            for (auto f = 0; f < obj->Frames; f++)
+            {
+                String line = "      \"";
+                for (auto i = 0; i < 2 * obj->Height; i++)
+                {
+                    line += IntToHex(data[(f * stride) + i] ,2);
+                }
+                for (auto j = 0; j < 4; j++)
+                {
+                    line += IntToHex(0x47,2);
+                }
+                content += line + "\"" + (f == obj->Frames -1 ? "" : ",") + "\r\n";
+            }
+            content += "    ]\r\n  }\r\n}";
+            System::File::WriteText(file, content);
+            project->AddFile(System::File::NameWithExtension(file), "Image", "Sprite");
+            project->Save();
+        }
+    }
+    // blocks/tiles
+    if (m_Blocks.size() != 0)
+    {
+        auto i = 0;
+        for (const auto& obj : m_Blocks)
+        {
+            auto file = System::File::Combine(path, "Block " + IntToStr(++i) + ".json");
+            String content = "{\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
+            BitmapData data;
+            String line = "      \"";
+            obj->GetBitmapData(data);
+            for (auto byte : data)
+            {
+                line += IntToHex(byte,2);
+            }
+            line += IntToHex(obj->Attribute);
+            content += line + "\"\r\n    ],\r\n    \"Layers\": [\r\n      {\r\n       \"Name\": \"blocktype\",\r\n       \"Data\": \"" + obj->SubType[1] + "\"\r\n      }\r\n    ]\r\n  }\r\n}";
+            System::File::WriteText(file, content);
+            project->AddFile(System::File::NameWithExtension(file), "Image", "Tile");
+            project->Save();
+        }
+    }
+
+    // save map/screens
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::ExportAGDFile()
+{
+    String content = "DEFINEWINDOW " + IntToStr(m_Window.y) + " " + IntToStr(m_Window.x) + " " + IntToStr(m_Window.h) + " " + IntToStr(m_Window.w) + "\r\n\r\n";
+    content += "DEFINEMESSAGES \r\n";
+    for (const auto& msg : m_Messages)
+    {
+        content += "\"" + msg + "\"\r\n";
+    }
+
+    content += "\r\nDEFINEFONT ";
+    // font
+    if (m_Font.size() == 1)
+    {
+        BitmapData data;
+        for (const auto& chr : m_Font)
+        {
+            String line;
+            chr->GetBitmapData(data);
+            int i = 0;
+            for (auto byte : data)
+            {
+                line += IntToStr(byte) + " ";
+                if ((++i % 8) == 0)
+                {
+                    content += line + "\r\n           ";
+                    line = "";
+                }
+            }
+        }
+    }
+    // blocks
+    if (m_Blocks.size() != 0)
+    {
+        for (const auto& blk : m_Blocks)
+        {
+            content += "\r\nDEFINEBLOCK " + blk->SubType + "            \r\n            ";
+            BitmapData data;
+            blk->GetBitmapData(data);
+            for (auto b : data)
+            {
+                content += IntToStr(b) + " ";
+            }
+            content += "\r\n            " + IntToStr(blk->Attribute) + "\r\n";
+        }
+    }
+    // sprites
+    if (m_Sprites.size() != 0)
+    {
+        for (const auto& spr : m_Sprites)
+        {
+            content += "\r\nDEFINESPRITE " + IntToStr(spr->Frames) + "\r\n             ";
+            BitmapData data;
+            spr->GetBitmapData(data);
+            auto stride = spr->Height * 2;
+            for (auto f = 0; f < spr->Frames; f++)
+            {
+                for (auto i = 0; i < stride; i++)
+                {
+                    content += IntToStr(data[f * stride + i]) + " ";
+                }
+                content += "\r\n             ";
+            }
+        }
+    }
+    // screen
+    if (m_Screens.size() != 0)
+    {
+        for (const auto& room : m_Screens)
+        {
+            content += "\r\nDEFINESCREEN ";
+            int w = 0;
+            for (auto blk : room->m_Blocks)
+            {
+                content += IntToStr(blk) + " ";
+                if (++w % m_Window.w == 0)
+                {
+                    content += "\r\n             ";
+                }
+            }
+            for (const auto& s : room->m_Sprites)
+            {
+                content += "\r\nSPRITEPOSITION " + IntToStr(s.Type) + " " + IntToStr(s.Index) + " " + IntToStr((int)s.Position.Y) + " "  + IntToStr((int)s.Position.X);
+            }
+            content += "\r\n";
+        }
+    }
+    // object
+    if (m_Objects.size() != 0)
+    {
+        for (const auto& obj : m_Objects)
+        {
+            const auto& o = dynamic_cast<ImageObject*>(obj.get());
+            content += "\r\nDEFINEOBJECT " + IntToStr(o->Attribute) + " " + IntToStr(o->Room) + " " + IntToStr((int)o->Position.Y) + " " + IntToStr((int)o->Position.X) + "\r\n             ";
+            BitmapData data;
+            obj->GetBitmapData(data);
+            for (auto b : data)
+            {
+                content += IntToStr(b) + " ";
+            }
+            content += "\r\n";
+        }
+    }
+    // map
+    content += "\r\nMAP WIDTH " + IntToStr(m_Map->Width) + "\r\n    STARTSCREEN " + IntToStr(m_Map->StartScreen) + "\r\n    ";
+    auto i = 0;
+    for (auto d : m_Map->m_MapData)
+    {
+        content += IntToStr(d) + " ";
+        if (++i % m_Map->Width == 0)
+        {
+            content += "\r\n    ";
+        }
+    }
+    content += "\r\nENDMAP\r\n\r\n";
+
+    // events
+    for (auto l : memEvents->Lines)
+    {
+        content += l + "\r\n";
+    }
+
+    auto name = System::File::NameWithoutExtension(m_File);
+    System::Path::ProjectName = name;
+    auto path = System::Path::Project;
+    auto file = System::File::Combine(path, "game.agd");
+    System::File::WriteText(file, content);
+}
+//---------------------------------------------------------------------------
+void __fastcall TfrmMain::ExportCustom()
+{
 }
 //---------------------------------------------------------------------------
 

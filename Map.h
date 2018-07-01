@@ -13,9 +13,10 @@ class Map
 private:
     int                 m_Width;
     int                 m_StartScreen;
-    MapData             m_MapData;
 
 public:
+    MapData             m_MapData;
+
             __fastcall  Map(const String& data);
 
     void    __fastcall  Draw(TBitmap* bitmap, int scalar, const Window& window, const ImageList& blocks, const ImageList& objects, const ImageList& sprites, const ScreenList& screens);
