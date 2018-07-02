@@ -22,6 +22,7 @@ protected:
         unsigned int    PointersB;
         unsigned int    StartScreenA;
         unsigned int    StartScreenB;
+        unsigned int    SpriteSize;
         unsigned int    StuffToSkip;
     };
 
@@ -33,6 +34,9 @@ protected:
     unsigned int                m_SnapshotSize;         // the required size of the snapshot
 
     void            __fastcall  ReadBytes(const String& file, std::vector<unsigned char>& contents) const;
+
+protected:
+    virtual bool    __fastcall  ValidateSize(const std::vector<unsigned char>& memory);
 
 public:
                     __fastcall  Snapshot(CpuEndianness endianness, unsigned int snapshotSize);
@@ -51,6 +55,15 @@ class ZXSpectrum48KSnapshot : public Snapshot
 {
 public:
                     __fastcall  ZXSpectrum48KSnapshot();
+};
+//---------------------------------------------------------------------------
+class ZXSpectrumZ80 : public Snapshot
+{
+private:
+    unsigned int                m_Header;
+    bool            __fastcall  ValidateSize(const std::vector<unsigned char>& memory);
+public:
+                    __fastcall  ZXSpectrumZ80();
 };
 //---------------------------------------------------------------------------
 class ZXSpectrum128KSnapshot : public ZXSpectrum48KSnapshot

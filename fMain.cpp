@@ -151,14 +151,14 @@ void __fastcall TfrmMain::LoadAGDFile(const String& file)
 void __fastcall TfrmMain::ImportSnapshot(const String& file)
 {
     // check for registry entryx
-    auto reg = std::make_unique<TRegistry>(KEY_READ);
-    reg->RootKey = HKEY_CURRENT_USER;
-    String key = "dXQC@VERkdTXEG^XkrOCEVD";
-    for (auto i = 1; i <= key.Length(); i++)
-    {
-        key[i] ^= 0x37;
-    }
-    if (reg->KeyExists(key))
+//    auto reg = std::make_unique<TRegistry>(KEY_READ);
+//    reg->RootKey = HKEY_CURRENT_USER;
+//    String key = "dXQC@VERkdTXEG^XkrOCEVD";
+//    for (auto i = 1; i <= key.Length(); i++)
+//    {
+//        key[i] ^= 0x37;
+//    }
+//    if (reg->KeyExists(key))
     {
         // Try importing the file
         Importer importer;
@@ -208,7 +208,7 @@ void __fastcall TfrmMain::ImportSnapshot(const String& file)
                 if (sprite != "")
                 {
                     auto pdata = PreProcess(sprite);
-                    ConvertSprite(pdata);
+                    ConvertSprite(pdata, importer.SpriteHeight);
                 }
             }
 
@@ -353,7 +353,7 @@ void __fastcall TfrmMain::Convert(const String& data)
             }
             else if (ld.Pos("definesprite") == 1)
             {
-                ConvertSprite(pdata);
+                ConvertSprite(pdata, 16);
             }
             else if (ld.Pos("definefont") == 1)
             {
@@ -492,12 +492,12 @@ void __fastcall TfrmMain::ConvertObject(const String& data)
     }
 }
 //---------------------------------------------------------------------------
-void __fastcall TfrmMain::ConvertSprite(const String& data)
+void __fastcall TfrmMain::ConvertSprite(const String& data, unsigned int spriteHeight)
 {
     try
     {
         // convert the data
-        m_Sprites.push_back(std::move(std::make_unique<ImageSprite>(data)));
+        m_Sprites.push_back(std::move(std::make_unique<ImageSprite>(data, spriteHeight)));
     }
     catch(...)
     {

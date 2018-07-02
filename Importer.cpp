@@ -334,9 +334,10 @@ bool __fastcall Importer::Convert(const String& file)
         m_AddressOf.nObjects = m_AddressOf.Objects - m_Snapshot->Location.StuffToSkip;
         m_AddressOf.EventCode = m_Snapshot->Word(m_Snapshot->Location.Pointers + 20);
         m_AddressOf.nEventCode = m_AddressOf.EventCode - m_Snapshot->Location.StuffToSkip;
-        m_AddressOf.Font = 	31232 - m_Snapshot->Location.StuffToSkip;
-        m_AddressOf.StartScreenA = 33580 - m_Snapshot->Location.StuffToSkip;
-        m_AddressOf.StartScreenB = 33615 - m_Snapshot->Location.StuffToSkip;
+        m_AddressOf.Font = 	m_Snapshot->Location.Font;
+        m_AddressOf.StartScreenA = m_Snapshot->Location.StartScreenA;
+        m_AddressOf.StartScreenB = m_Snapshot->Location.StartScreenB;
+        m_AddressOf.SpriteSize = m_Snapshot->Location.SpriteSize;
 
         ImportWindow();
         ImportMessages();
@@ -431,7 +432,12 @@ void __fastcall Importer::ImportSprites()
 	auto cImg = m_AddressOf.nSpriteData; 							            /* sprite image data. */
 	auto nGroups = (m_AddressOf.nSpriteData - m_AddressOf.nSpriteFrames) / 2;   /* total sprite groups. */
 
-    const auto h = 32;
+    auto h = m_Snapshot->Byte(m_AddressOf.SpriteSize);
+    m_SpriteHeight = h;
+    if (h != 16 && h != 24)
+    {
+        h = 16;
+    }
 	while (nGroups-- > 0)
 	{
 		auto nFrames = m_Snapshot->Byte(cFrm);
@@ -439,12 +445,12 @@ void __fastcall Importer::ImportSprites()
 
 		while (nFrames-- > 0)
 		{
-			for (auto i = 0; i < h; i++ )
+			for (auto i = 0; i < h * 2; i++ )
 			{
                 m_Sprites += " " + IntToStr(m_Snapshot->Byte(cImg++));
 			}
-			nCount -= 4 * h;
-			cImg += 3 * h;									/* skip shifted versions. */
+			nCount -= 8 * h;
+			cImg += 6 * h;									/* skip shifted versions. */
 		}
 		cFrm += 2;
         m_Sprites += "ª";

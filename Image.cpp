@@ -7,7 +7,7 @@
 //---------------------------------------------------------------------------
 int g_File = 1;
 //---------------------------------------------------------------------------
-__fastcall Image::Image(ImageType type, const String& data)
+__fastcall Image::Image(ImageType type, const String& data, unsigned int height)
 : m_ScalarX(1)
 , m_Frames(1)
 , m_Attribute(0x47)
@@ -30,7 +30,7 @@ __fastcall Image::Image(ImageType type, const String& data)
                 break;
             case itSprite:
                 m_Bitmap->Width = 16;
-                m_Bitmap->Height = 16;
+                m_Bitmap->Height = height;
                 break;
             case itFont:
                 m_Bitmap->Width = 8;
@@ -318,8 +318,8 @@ __fastcall ImageObject::~ImageObject()
 
 }
 //---------------------------------------------------------------------------
-__fastcall ImageSprite::ImageSprite(const String& data)
-: Image(itSprite, data)
+__fastcall ImageSprite::ImageSprite(const String& data, unsigned int spriteHeight)
+: Image(itSprite, data, spriteHeight)
 {
     m_Attribute = 0x47; // White on Black
     m_Frames = m_BitmapData.front();
@@ -328,6 +328,7 @@ __fastcall ImageSprite::ImageSprite(const String& data)
     auto size = m_BitmapData.size();
     auto frame_size = size / m_Frames;
     m_Height = frame_size / 2;
+    //assert(spriteHeight == m_Height);
     m_Bitmap->Height = m_Height;
     auto idx = 0;
     auto offset = 0;

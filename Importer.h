@@ -43,6 +43,7 @@ private:
         unsigned int    Font;
         unsigned int    StartScreenA;
         unsigned int    StartScreenB;
+        unsigned int    SpriteSize;
     };
 
     Addresses                   m_AddressOf;
@@ -57,6 +58,7 @@ private:
     String                      m_Map;
     String                      m_Messages;
     String                      m_Events;
+    unsigned int                m_SpriteHeight;
 
     int                         nTabs;
     int                         nPrintMode;
@@ -91,6 +93,7 @@ public:
     String      __property  Map = { read = m_Map };
     String      __property  Messages = { read = m_Messages };
     String      __property  Events = { read = m_Events };
+   unsigned int __property  SpriteHeight = { read = m_SpriteHeight };
 };
 //---------------------------------------------------------------------------
 #endif

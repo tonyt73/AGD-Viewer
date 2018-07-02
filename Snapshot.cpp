@@ -28,7 +28,7 @@ bool __fastcall Snapshot::Load(const String& file)
         ReadBytes(file, m_Memory);
         if (m_Memory.size() > 0)
         {
-            if (m_Memory.size() == m_SnapshotSize)
+            if (ValidateSize(m_Memory))
             {
                 auto address = Word(Location.PointersA);
                 if (address == 36924)
@@ -71,6 +71,62 @@ UInt16 __fastcall Snapshot::Word(unsigned int address) const
     return m_Endianness == LittleEndian ? little : big;
 }
 //---------------------------------------------------------------------------
+bool __fastcall Snapshot::ValidateSize(const std::vector<unsigned char>& memory)
+{
+    return memory.size() == m_SnapshotSize;
+}
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+const int Z80v1 = 65536 + 30;
+//---------------------------------------------------------------------------
+__fastcall ZXSpectrumZ80::ZXSpectrumZ80()
+: Snapshot(LittleEndian, 0)
+{
+    m_Snapshoter = "ZX Spectrum 48K";
+    if (m_Version == 1)
+    {
+        m_Locations.StuffToSkip = 16384 - 27;
+        m_Locations.Font = 31232 - m_Locations.StuffToSkip;
+        m_Locations.Map = 31959 - m_Locations.StuffToSkip;
+        m_Locations.Window = 32008 - m_Locations.StuffToSkip;
+        m_Locations.NumberOfScreens = 32018 - m_Locations.StuffToSkip;
+        m_Locations.Pointers = 32059 - m_Locations.StuffToSkip;
+        m_Locations.PointersA = 32057 - m_Locations.StuffToSkip;
+        m_Locations.PointersB = 32059 - m_Locations.StuffToSkip;
+        m_Locations.StartScreenA = 33580 - m_Locations.StuffToSkip;
+        m_Locations.StartScreenB = 33615 - m_Locations.StuffToSkip;
+        m_Locations.SpriteSize = 35931 - m_Locations.StuffToSkip;
+    }
+}
+//---------------------------------------------------------------------------
+bool __fastcall ZXSpectrumZ80::ValidateSize(const std::vector<unsigned char>& memory)
+{
+    if (memory.size() == Z80v1)
+    {
+        m_Header = 30;
+        m_Version = 1;
+        return true;
+    }
+    else if (memory[6] == 0 && memory[7] == 0)
+    {
+        m_Header = 87;
+        // possible version 2, 3
+        if (memory[30] == 23)
+        {
+            m_Version = 2;
+            return true;
+        }
+        else if (memory[30] == 54 || memory[30] == 55)
+        {
+            m_Version = 3;
+            return true;
+        }
+    }
+    return false;
+}
+//---------------------------------------------------------------------------
 
 
 
@@ -91,6 +147,7 @@ __fastcall ZXSpectrum48KSnapshot::ZXSpectrum48KSnapshot()
     m_Locations.PointersB = 32059 - m_Locations.StuffToSkip;
     m_Locations.StartScreenA = 33580 - m_Locations.StuffToSkip;
     m_Locations.StartScreenB = 33615 - m_Locations.StuffToSkip;
+    m_Locations.SpriteSize = 35931 - m_Locations.StuffToSkip;
 }
 //---------------------------------------------------------------------------
 const unsigned int ZX_128K_SNAPSHOT_SIZE = 24 + 81920 + 3;

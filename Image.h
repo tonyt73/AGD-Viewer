@@ -27,7 +27,7 @@ protected:
     void        __fastcall  DrawAmstradCPC(const BitmapData& data, int offset = 0);
 
 public:
-                __fastcall  Image(ImageType type, const String& data);
+                __fastcall  Image(ImageType type, const String& data, unsigned int height = 0);
     virtual     __fastcall ~Image();
                             // draw bitmap onto image - return width of image drawn adjusted for scaling
     int         __fastcall  Draw(int x, int y, TBitmap* bitmap, int scalar, int frame = -1);
@@ -73,7 +73,7 @@ public:
 class ImageSprite : public Image
 {
 public:
-        __fastcall  ImageSprite(const String& data);
+        __fastcall  ImageSprite(const String& data, unsigned int spriteHeight);
         __fastcall ~ImageSprite();
 };
 //---------------------------------------------------------------------------

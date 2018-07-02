@@ -141,7 +141,7 @@ private:	// User declarations
     void    __fastcall  ConvertWindow(const String& data);
     void    __fastcall  ConvertBlock(const String& data);
     void    __fastcall  ConvertObject(const String& data);
-    void    __fastcall  ConvertSprite(const String& data);
+    void    __fastcall  ConvertSprite(const String& data, unsigned int spriteHeight);
     void    __fastcall  ConvertFont(const String& data);
     void    __fastcall  ConvertMessages(const String& data);
     void    __fastcall  ConvertEventCode();
