@@ -17,11 +17,13 @@ __fastcall Map::Map(const String& data)
             if (prevToken.LowerCase() == "width")
             {
                 m_Width = StrToInt(token.Trim());
+                g_ErrorReporter.Add("Info: Map - Width: " + IntToStr(m_Width));
             }
             else if (prevToken.LowerCase() == "startscreen")
             {
                 m_StartScreen = StrToInt(token.Trim());
                 storeScreens = true;
+                g_ErrorReporter.Add("Info: Map - Start Screen: " + IntToStr(m_StartScreen));
             }
             else if (storeScreens && token.Trim() != "")
             {
@@ -29,6 +31,9 @@ __fastcall Map::Map(const String& data)
             }
             prevToken = token.Trim();
         }
+        int size = m_MapData.size();
+        auto rows = size / m_Width;
+        g_ErrorReporter.Add("Info: Map - Screens: " + IntToStr(size) + ", " + IntToStr(m_Width) + "x" + IntToStr(rows));
     }
     catch(...)
     {

@@ -78,6 +78,11 @@ void __fastcall TfrmMain::OpenFile(const String& file)
     {
         ImportSnapshot(file);
     }
+    // report on the load
+    g_ErrorReporter.Add("Info: Window - " + IntToStr(m_Window.x) +", " + IntToStr(m_Window.y) + " - " + IntToStr(m_Window.w) + "x" + IntToStr(m_Window.h));
+    g_ErrorReporter.Add("Info: Sprites - " + IntToStr((int)m_Sprites.size()));
+    g_ErrorReporter.Add("Info: Blocks  - " + IntToStr((int)m_Blocks.size()));
+    g_ErrorReporter.Add("Info: Objects - " + IntToStr((int)m_Objects.size()));
     RefreshImagesView();
     RefreshMapView();
     memEvents->Lines->Add(m_EventCode);
