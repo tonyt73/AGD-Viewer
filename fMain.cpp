@@ -1080,7 +1080,10 @@ void __fastcall TfrmMain::ExportAGDXProject()
         for (const auto& obj : m_Blocks)
         {
             auto file = System::File::Combine(path, "Block " + IntToStr(++i) + ".json");
-            String content = "{\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
+            String content =
+            "{\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) +
+            ",\r\n    \"Height\": " + IntToStr(obj->Height) +
+            ",\r\n    \"Frames\": [\r\n";
             BitmapData data;
             String line = "      \"";
             obj->GetBitmapData(data);
@@ -1097,6 +1100,77 @@ void __fastcall TfrmMain::ExportAGDXProject()
     }
 
     // save map/screens
+    if (m_Map->Width > 0 && m_Map->Height > 0)
+    {
+        auto file = System::File::Combine(path, "Tile Map.json");
+        String content =
+        "{\r\n  \"Map\": {\r\n    \"RoomsAcross\": " + IntToStr(m_Map->Width) +
+        ",\r\n    \"RoomsDown\": " + IntToStr(m_Map->Height) +
+        ",\r\n    \"RoomWidth\": " + IntToStr(m_Window.w) +
+        ",\r\n    \"RoomHeight\": " + IntToStr(m_Window.h) +
+        ",\r\n    \"StartLocationX\": " + IntToStr(m_Map->StartScreen % m_Map->Width) +
+        ",\r\n    \"StartLocationY\": " + IntToStr(m_Map->StartScreen / m_Map->Width) +
+        ",\r\n    \"Entities\": [\r\n";
+
+        // output each rooms entity
+        auto rx = 0;
+        auto ry = 0;
+        for (auto room : m_Map->m_MapData)
+        {
+            // get the blocks for the room
+            if (room != 0xff)
+            {
+                auto bx = 0;
+                auto by = 0;
+                for (const auto& block : m_Screens[room]->m_Blocks)
+                {
+                    auto x = (rx * m_Window.w) + bx;
+                    auto y = (ry * m_Window.h) + by;
+                    content += "      {\r\n        \"X\":" + IntToStr(x) +
+                                     ",\r\n        \"Y\":" + IntToStr(y) +
+                                     ",\r\n        \"Name\":\"Block " + IntToStr(block) + "\"" +
+                                     ",\r\n        \"Type\":\"Image\"" +
+                                     ",\r\n        \"SubType\":\"Tile\"" +
+                               "\r\n      }";
+                    if (++bx == m_Window.w)
+                    {
+                        bx = 0;
+                        ++by;
+                    }
+                    content += ",\r\n";
+                }
+                auto sx = 0;
+                auto sy = 0;
+                for (const auto& sprite : m_Screens[room]->m_Sprites)
+                {
+                    auto x = (rx * m_Window.w) + sprite.Position.X;
+                    auto y = (ry * m_Window.h) + sprite.Position.Y;
+                    content += "      {\r\n        \"X\":" + IntToStr((int)x) +
+                                     ",\r\n        \"Y\":" + IntToStr((int)y) +
+                                     ",\r\n        \"Name\":\"Sprite " + IntToStr(sprite.Index) + "\"" +
+                                     ",\r\n        \"Type\":\"Image\"" +
+                                     ",\r\n        \"SubType\":\"Sprite\"" +
+                               "\r\n      }";
+                    if (++bx == m_Window.w)
+                    {
+                        bx = 0;
+                        ++by;
+                    }
+                    content += ",\r\n";
+                }
+            }
+            if (++rx == m_Map->Width)
+            {
+                rx = 0;
+                ry++;
+            }
+        }
+        content = content.SubString(1, content.Length() - 3);
+        content += "\r\n    ]\r\n  }\r\n}";
+        System::File::WriteText(file, content);
+        project->AddFile("Tile Map.json", "Map", "Tiled");
+        project->Save();
+    }
 }
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::ExportAGDFile()

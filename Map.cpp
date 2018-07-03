@@ -32,8 +32,8 @@ __fastcall Map::Map(const String& data)
             prevToken = token.Trim();
         }
         int size = m_MapData.size();
-        auto rows = size / m_Width;
-        g_ErrorReporter.Add("Info: Map - Screens: " + IntToStr(size) + ", " + IntToStr(m_Width) + "x" + IntToStr(rows));
+        m_Height = size / m_Width;
+        g_ErrorReporter.Add("Info: Map - Screens: " + IntToStr(size) + ", " + IntToStr(m_Width) + "x" + IntToStr(m_Height));
     }
     catch(...)
     {

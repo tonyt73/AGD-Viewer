@@ -12,6 +12,7 @@ class Map
 {
 private:
     int                 m_Width;
+    int                 m_Height;
     int                 m_StartScreen;
 
 public:
@@ -22,6 +23,7 @@ public:
     void    __fastcall  Draw(TBitmap* bitmap, int scalar, const Window& window, const ImageList& blocks, const ImageList& objects, const ImageList& sprites, const ScreenList& screens);
 
     int     __property  Width = { read = m_Width };
+    int     __property  Height = { read = m_Height };
     int     __property  StartScreen = { read = m_StartScreen };
 };
 //---------------------------------------------------------------------------
