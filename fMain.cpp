@@ -1063,6 +1063,14 @@ void __fastcall TfrmMain::ExportAGDXProject()
     // blocks/tiles
     if (m_Blocks.size() != 0)
     {
+        std::map<String,String> blockTypeMap;
+        blockTypeMap["E"] = "0";
+        blockTypeMap["P"] = "1";
+        blockTypeMap["W"] = "2";
+        blockTypeMap["L"] = "3";
+        blockTypeMap["F"] = "4";
+        blockTypeMap["D"] = "5";
+        blockTypeMap["C"] = "6";
         auto i = 0;
         for (const auto& obj : m_Blocks)
         {
@@ -1076,7 +1084,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
                 line += IntToHex(byte,2);
             }
             line += IntToHex(obj->Attribute);
-            content += line + "\"\r\n    ],\r\n    \"Layers\": [\r\n      {\r\n       \"Name\": \"blocktype\",\r\n       \"Data\": \"" + obj->SubType[1] + "\"\r\n      }\r\n    ]\r\n  }\r\n}";
+            content += line + "\"\r\n    ],\r\n    \"Layers\": [\r\n      {\r\n       \"Name\": \"blocktype\",\r\n       \"Data\": \"" + blockTypeMap[obj->SubType[1]] + "\"\r\n      }\r\n    ]\r\n  }\r\n}";
             System::File::WriteText(file, content);
             project->AddFile(System::File::NameWithExtension(file), "Image", "Tile");
             project->Save();
