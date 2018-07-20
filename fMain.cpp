@@ -1137,7 +1137,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
                     content += "      {\r\n        \"X\":" + IntToStr(x) +
                                      ",\r\n        \"Y\":" + IntToStr(y) +
                                      ",\r\n        \"RefId\":" + IntToStr(m_Blocks[block]->Id) +
-                               "\r\n      }";
+                                     "\r\n      }";
                     if (++bx == m_Window.w)
                     {
                         bx = 0;
@@ -1149,20 +1149,21 @@ void __fastcall TfrmMain::ExportAGDXProject()
                 auto sy = 0;
                 for (const auto& sprite : m_Screens[room]->m_Sprites)
                 {
-                    auto x = (rx * m_Window.w) + sprite.Position.X;
-                    auto y = (ry * m_Window.h) + sprite.Position.Y;
-                    content += "      {\r\n        \"X\":" + IntToStr((int)x) +
-                                     ",\r\n        \"Y\":" + IntToStr((int)y) +
-                                     ",\r\n        \"Name\":\"Sprite " + IntToStr(sprite.Index) + "\"" +
-                                     ",\r\n        \"Type\":\"Image\"" +
-                                     ",\r\n        \"SubType\":\"Sprite\"" +
-                               "\r\n      }";
-                    if (++bx == m_Window.w)
+                    if (sprite.Index < m_Sprites.size())
                     {
-                        bx = 0;
-                        ++by;
+                        auto x = (rx * m_Window.w) + sprite.Position.X;
+                        auto y = (ry * m_Window.h) + sprite.Position.Y;
+                        content += "      {\r\n        \"X\":" + IntToStr((int)x) +
+                                         ",\r\n        \"Y\":" + IntToStr((int)y) +
+                                         ",\r\n        \"RefId\":" + IntToStr(m_Sprites[sprite.Index]->Id) +
+                                   "\r\n      }";
+                        if (++bx == m_Window.w)
+                        {
+                            bx = 0;
+                            ++by;
+                        }
+                        content += ",\r\n";
                     }
-                    content += ",\r\n";
                 }
             }
             if (++rx == m_Map->Width)
