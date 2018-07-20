@@ -940,6 +940,7 @@ void __fastcall TfrmMain::actExportCustomExecute(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::ExportAGDXProject()
 {
+    int id = 1;
     auto project = std::make_unique<Project>();
     auto name = System::File::NameWithoutExtension(m_File);
     project->Create(name, "ZX Spectrum 256x192 16 Colour");
@@ -1011,13 +1012,15 @@ void __fastcall TfrmMain::ExportAGDXProject()
         project->Save();
     }
     // objects
+    int objId = id + 1;
     if (m_Objects.size() != 0)
     {
         auto i = 0;
-        for (const auto& obj : m_Objects)
+        for (auto& obj : m_Objects)
         {
+            obj->Id = ++id;
             auto file = System::File::Combine(path, "Object " + IntToStr(++i) + ".json");
-            String content = "{\r\n  \"Image\": {\r\n    \"Width\": 16,\r\n    \"Height\": 16,\r\n    \"Frames\": [\r\n";
+            String content = "{\r\n  \"Document\": {\r\n    \"RefId\": " + IntToStr(obj->Id) + "\r\n  },\r\n  \"Image\": {\r\n    \"Width\": 16,\r\n    \"Height\": 16,\r\n    \"Frames\": [\r\n";
             BitmapData data;
             String line = "      \"";
             obj->GetBitmapData(data);
@@ -1036,13 +1039,15 @@ void __fastcall TfrmMain::ExportAGDXProject()
         }
     }
     // sprites
+    int sprId = id + 1;
     if (m_Sprites.size() != 0)
     {
         auto i = 0;
-        for (const auto& obj : m_Sprites)
+        for (auto& obj : m_Sprites)
         {
+            obj->Id = ++id;
             auto file = System::File::Combine(path, "Sprite " + IntToStr(++i) + ".json");
-            String content = "{\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
+            String content = "{\r\n  \"Document\": {\r\n    \"RefId\": " + IntToStr(obj->Id) + "\r\n  },\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
             BitmapData data;
             obj->GetBitmapData(data);
             auto stride = 2 * obj->Height;
@@ -1066,6 +1071,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
         }
     }
     // blocks/tiles
+    int blkId = id + 1;
     if (m_Blocks.size() != 0)
     {
         std::map<String,String> blockTypeMap;
@@ -1077,11 +1083,13 @@ void __fastcall TfrmMain::ExportAGDXProject()
         blockTypeMap["D"] = "5";
         blockTypeMap["C"] = "6";
         auto i = 0;
-        for (const auto& obj : m_Blocks)
+        for (auto& obj : m_Blocks)
         {
+            obj->Id = ++id;
             auto file = System::File::Combine(path, "Block " + IntToStr(++i) + ".json");
             String content =
-            "{\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) +
+            "{\r\n  \"Document\": {\r\n    \"RefId\": " + IntToStr(obj->Id) +
+            "\r\n  },\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) +
             ",\r\n    \"Height\": " + IntToStr(obj->Height) +
             ",\r\n    \"Frames\": [\r\n";
             BitmapData data;
@@ -1110,7 +1118,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
         ",\r\n    \"RoomHeight\": " + IntToStr(m_Window.h) +
         ",\r\n    \"StartLocationX\": " + IntToStr(m_Map->StartScreen % m_Map->Width) +
         ",\r\n    \"StartLocationY\": " + IntToStr(m_Map->StartScreen / m_Map->Width) +
-        ",\r\n    \"Entities\": [\r\n";
+        ",\r\n    \"Workspace\": [\r\n";
 
         // output each rooms entity
         auto rx = 0;
@@ -1128,9 +1136,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
                     auto y = (ry * m_Window.h) + by;
                     content += "      {\r\n        \"X\":" + IntToStr(x) +
                                      ",\r\n        \"Y\":" + IntToStr(y) +
-                                     ",\r\n        \"Name\":\"Block " + IntToStr(block) + "\"" +
-                                     ",\r\n        \"Type\":\"Image\"" +
-                                     ",\r\n        \"SubType\":\"Tile\"" +
+                                     ",\r\n        \"RefId\":" + IntToStr(m_Blocks[block]->Id) +
                                "\r\n      }";
                     if (++bx == m_Window.w)
                     {

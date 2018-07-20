@@ -21,6 +21,7 @@ protected:
     int                     m_Width;
     int                     m_Frames;
     int                     m_ScalarX;
+    int                     m_Id;
 
     void        __fastcall  DrawSpectrum(const BitmapData& data, unsigned char attr, int offset = 0);
     void        __fastcall  DrawSpectrumNext(const BitmapData& data, int offset = 0);
@@ -36,6 +37,7 @@ public:
    virtual void __fastcall  Assign(TBitmap* bitmap);
            void __fastcall  GetBitmapData(BitmapData& data) const;
 
+    int         __property  Id = { read = m_Id, write = m_Id };
     ImageType   __property  Type = { read = m_Type };
     String      __property  SubType = { read = m_SubType };
 MachinePalette  __property  Palette = { read = m_Palette };
