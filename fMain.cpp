@@ -1132,26 +1132,29 @@ void __fastcall TfrmMain::ExportAGDXProject()
                 auto by = 0;
                 for (const auto& block : m_Screens[room]->m_Blocks)
                 {
-                    auto x = (rx * m_Window.w) + bx;
-                    auto y = (ry * m_Window.h) + by;
-                    content += "      {\r\n        \"X\":" + IntToStr(x) +
-                                     ",\r\n        \"Y\":" + IntToStr(y) +
-                                     ",\r\n        \"RefId\":" + IntToStr(m_Blocks[block]->Id) +
-                                     "\r\n      }";
+                    if (block)
+                    {
+                        auto x = ((rx * m_Window.w) + bx) * 8;
+                        auto y = ((ry * m_Window.h) + by) * 8;
+                        content += "      {\r\n        \"X\":" + IntToStr(x) +
+                                         ",\r\n        \"Y\":" + IntToStr(y) +
+                                         ",\r\n        \"RefId\":" + IntToStr(m_Blocks[block]->Id) +
+                                         "\r\n      }";
+                        content += ",\r\n";
+                    }
                     if (++bx == m_Window.w)
                     {
                         bx = 0;
                         ++by;
                     }
-                    content += ",\r\n";
                 }
 
                 for (const auto& sprite : m_Screens[room]->m_Sprites)
                 {
                     if (sprite.Index < m_Sprites.size())
                     {
-                        auto x = (rx * m_Window.w) + (sprite.Position.X/8) - m_Window.x;
-                        auto y = (ry * m_Window.h) + (sprite.Position.Y/8) - m_Window.y;
+                        auto x = ((rx * m_Window.w) + ((sprite.Position.X/8) - m_Window.x)) * 8;
+                        auto y = ((ry * m_Window.h) + ((sprite.Position.Y/8) - m_Window.y)) * 8;
                         content += "      {\r\n        \"X\":" + IntToStr((int)x) +
                                          ",\r\n        \"Y\":" + IntToStr((int)y) +
                                          ",\r\n        \"RefId\":" + IntToStr(m_Sprites[sprite.Index]->Id) +
@@ -1165,8 +1168,8 @@ void __fastcall TfrmMain::ExportAGDXProject()
                     const auto& o = dynamic_cast<ImageObject*>(object.get());
                     if (room == o->Room)
                     {
-                        auto x = (rx * m_Window.w) + (o->Position.X/8) - m_Window.x;
-                        auto y = (ry * m_Window.h) + (o->Position.Y/8) - m_Window.y;
+                        auto x = ((rx * m_Window.w) + ((o->Position.X/8) - m_Window.x)) * 8;
+                        auto y = ((ry * m_Window.h) + ((o->Position.Y/8) - m_Window.y)) * 8;
                         content += "      {\r\n        \"X\":" + IntToStr((int)x) +
                                          ",\r\n        \"Y\":" + IntToStr((int)y) +
                                          ",\r\n        \"RefId\":" + IntToStr(o->Id) +

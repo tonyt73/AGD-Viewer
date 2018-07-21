@@ -7,7 +7,7 @@
         <MainSource>AGDv.cpp</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
-        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -167,8 +167,8 @@
         <BCC_UseClassicCompiler>false</BCC_UseClassicCompiler>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Icon_MainIcon>AGDv.ico</Icon_MainIcon>
-        <VerInfo_Build>11</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Scorpio Designs;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.11;InternalName=AGDv;LegalCopyright=2018 Tony Thompson;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Programmed by Tony Thompson</VerInfo_Keys>
+        <VerInfo_Build>12</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=Scorpio Designs;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.12;InternalName=AGDv;LegalCopyright=2018 Tony Thompson;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Programmed by Tony Thompson</VerInfo_Keys>
         <BCC_EnableBatchCompilation>true</BCC_EnableBatchCompilation>
         <BCC_InstructionSet>6</BCC_InstructionSet>
     </PropertyGroup>
