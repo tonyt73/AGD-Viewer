@@ -1120,7 +1120,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
         ",\r\n    \"StartLocationY\": " + IntToStr(m_Map->StartScreen / m_Map->Width) +
         ",\r\n    \"Workspace\": [\r\n";
 
-        // output each rooms entity
+        // output each rooms entity list
         auto rx = 0;
         auto ry = 0;
         for (auto room : m_Map->m_MapData)
@@ -1145,23 +1145,32 @@ void __fastcall TfrmMain::ExportAGDXProject()
                     }
                     content += ",\r\n";
                 }
-                auto sx = 0;
-                auto sy = 0;
+
                 for (const auto& sprite : m_Screens[room]->m_Sprites)
                 {
                     if (sprite.Index < m_Sprites.size())
                     {
-                        auto x = (rx * m_Window.w) + sprite.Position.X;
-                        auto y = (ry * m_Window.h) + sprite.Position.Y;
+                        auto x = (rx * m_Window.w) + (sprite.Position.X/8) - m_Window.x;
+                        auto y = (ry * m_Window.h) + (sprite.Position.Y/8) - m_Window.y;
                         content += "      {\r\n        \"X\":" + IntToStr((int)x) +
                                          ",\r\n        \"Y\":" + IntToStr((int)y) +
                                          ",\r\n        \"RefId\":" + IntToStr(m_Sprites[sprite.Index]->Id) +
                                    "\r\n      }";
-                        if (++bx == m_Window.w)
-                        {
-                            bx = 0;
-                            ++by;
-                        }
+                        content += ",\r\n";
+                    }
+                }
+
+                for (const auto& object : m_Objects)
+                {
+                    const auto& o = dynamic_cast<ImageObject*>(object.get());
+                    if (room == o->Room)
+                    {
+                        auto x = (rx * m_Window.w) + (o->Position.X/8) - m_Window.x;
+                        auto y = (ry * m_Window.h) + (o->Position.Y/8) - m_Window.y;
+                        content += "      {\r\n        \"X\":" + IntToStr((int)x) +
+                                         ",\r\n        \"Y\":" + IntToStr((int)y) +
+                                         ",\r\n        \"RefId\":" + IntToStr(o->Id) +
+                                   "\r\n      }";
                         content += ",\r\n";
                     }
                 }

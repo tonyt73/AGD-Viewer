@@ -8,7 +8,8 @@
 int g_File = 1;
 //---------------------------------------------------------------------------
 __fastcall Image::Image(ImageType type, const String& data, unsigned int height)
-: m_ScalarX(1)
+: m_Type(type)
+, m_ScalarX(1)
 , m_Frames(1)
 , m_Attribute(0x47)
 , m_Palette(mpZXSpectrum)
@@ -303,9 +304,11 @@ __fastcall ImageObject::ImageObject(const String& data)
             DrawSpectrum(m_BitmapData, m_Attribute);
             break;
         case 16: // ZX Spectrum Next/Timex
+            // TODO: Room? Position?
             DrawSpectrumNext(m_BitmapData);
             break;
         case 67: // Amstrad CPC
+            // TODO: Room? Position?
             m_Width = 8;
             m_Bitmap->Width = m_Width;
             DrawAmstradCPC(m_BitmapData);
@@ -346,12 +349,11 @@ __fastcall ImageSprite::ImageSprite(const String& data, unsigned int spriteHeigh
             case 48:
                 DrawSpectrum(bitmapData, m_Attribute, offset);
                 break;
-            case 80:
+            case 80:    // Amstrad CPC
                 m_Width = 10;
                 m_Bitmap->Width = m_Width * m_Frames;
                 DrawAmstradCPC(bitmapData, offset);
                 break;
-
         }
         offset += m_Width;
     }

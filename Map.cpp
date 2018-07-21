@@ -55,14 +55,12 @@ void __fastcall Map::Draw(TBitmap* bitmap, int scalar, const Window& window, con
         auto x = 0;
         auto y = 0;
         auto w = 0;
-        auto room = 0;
         for (const auto& screen : m_MapData)
         {
             if (screen != 255)
             {
-                screens[screen]->Draw(room, x, y, bitmap, scalar, blocks, objects, sprites, window);
+                screens[screen]->Draw(screen, x, y, bitmap, scalar, blocks, objects, sprites, window);
             }
-            room++;
             x += sw;
             if (++w == m_Width)
             {
