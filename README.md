@@ -23,3 +23,16 @@ Supports:
 * ZX Spectrum 8x8 attribute mode
 * ZX Spectrum Next/Timex 8x1 attribute mode
 * Amstrad CPC mode 0
+
+
+## Build Instructions
+
+* Clone this repo on to your PC
+* Download the Embarcardero Rad-Studio C++ Community Edition
+** https://www.embarcadero.com/products/cbuilder/starter
+** Register if you need to (its free)
+* Install the 32 bit and 64 bit Windows compilers (OSX, iOS & Android are optional)
+* Launch the Rad-Studio IDE
+** Open up the location you cloned this repo to
+** Open the AGDx Viewer.cproj file
+* Press F9 to build and run the application
