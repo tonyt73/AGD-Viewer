@@ -30,6 +30,7 @@ Supports:
 * Clone this repo on to your PC
 * Download the Embarcardero Rad-Studio C++ Community Edition
 ** https://www.embarcadero.com/products/cbuilder/starter
+
 ** Register if you need to (its free)
 * Install the 32 bit and 64 bit Windows compilers (OSX, iOS & Android are optional)
 * Launch the Rad-Studio IDE
