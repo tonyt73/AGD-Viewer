@@ -1,10 +1,10 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{E4941F5E-EE13-47AA-9CF4-83BE634B14F5}</ProjectGuid>
-        <ProjectVersion>18.3</ProjectVersion>
+        <ProjectVersion>18.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <AppType>Application</AppType>
-        <MainSource>AGDv.cpp</MainSource>
+        <MainSource>AGDx Viewer.cpp</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
@@ -78,8 +78,8 @@
         <UWP_CppLogo150>$(BDS)\bin\Artwork\Windows\UWP\cppreg_UwpDefault_150.png</UWP_CppLogo150>
         <IncludePath>AGDv\;$(IncludePath)</IncludePath>
         <ILINK_LibraryPath>AGDv\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
-        <SanitizedProjectName>AGDv</SanitizedProjectName>
-        <BCC_PCHInject>agdv.pch.h</BCC_PCHInject>
+        <SanitizedProjectName>AGDx_Viewer</SanitizedProjectName>
+        <BCC_PCHInject>AGDv.pch.h</BCC_PCHInject>
         <Custom_Styles>Glow|VCLSTYLE|$(BDSCOMMONDIR)\Styles\Glow.vsf</Custom_Styles>
         <VerInfo_Locale>3081</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=Scorpio Designs;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=AGDv;LegalCopyright=2018 Tony Thompson;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Programmed by Tony Thompson</VerInfo_Keys>
@@ -97,14 +97,14 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <Icon_MainIcon>AGDv.ico</Icon_MainIcon>
-        <BCC_PCHName_Clang>agdv.pch.h</BCC_PCHName_Clang>
+        <BCC_PCHName_Clang>AGDv.pch.h</BCC_PCHName_Clang>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <PackageImports>adortl;appanalytics;bindcomp;bindcompdbx;bindcompfmx;bindcompvcl;bindengine;CustomIPTransport;DataSnapClient;DataSnapCommon;DataSnapConnectors;DatasnapConnectorsFreePascal;DataSnapIndy10ServerTransport;DataSnapNativeClient;DataSnapProviderClient;DataSnapServer;DataSnapServerMidas;dbexpress;dbrtl;dbxcds;DbxClientDriver;DbxCommonDriver;DBXDb2Driver;DBXFirebirdDriver;DBXInformixDriver;DBXInterBaseDriver;DBXMSSQLDriver;DBXMySQLDriver;DBXOdbcDriver;DBXOracleDriver;DBXSqliteDriver;DBXSybaseASADriver;DBXSybaseASEDriver;dsnap;dsnapcon;dsnapxml;emsedge;emshosting;FireDACADSDriver;FireDACASADriver;FireDACCommonODBC;FireDACDb2Driver;FireDACDBXDriver;FireDACDSDriver;FireDACInfxDriver;FireDACMongoDBDriver;FireDACMSAccDriver;FireDACMSSQLDriver;FireDACMySQLDriver;FireDACODBCDriver;FireDACOracleDriver;FireDACPgDriver;FireDACTDataDriver;fmx;fmxase;fmxdae;fmxFireDAC;fmxobj;IndyCore;IndyIPClient;IndyIPCommon;IndyIPServer;IndyProtocols;IndySystem;inetdb;inetdbxpress;lmdrtbar;lmdrtchart;lmdrtchartdb;lmdrtcore;lmdrtdesign;lmdrtdialog;lmdrtdocking;lmdrtelcore;lmdrteldb;lmdrtelpro;lmdrtfx;lmdrtgrid;lmdrtide;lmdrtinspector;lmdrtl;lmdrtplugin;lmdrtprint;lmdrtrtf;lmdrtrtfdb;lmdrtrtlx;lmdrtscript;lmdrtscriptimp;lmdrtsearch;lmdrtsearchdb;lmdrtshell;lmdrtstorage;lmdrtsyntax;lmdrtsys;lmdrtthemes;lmdrttools;lmdrttoolsdb;lmdrttxt;lmdrttxtdb;lmdrtweb;rtl;tethering;vcl;vclactnband;vcldb;vcldsnap;vclFireDAC;vclie;vclimg;VCLRESTComponents;VclSmp;vcltouch;vclwinx;vclx;xmlrtl;$(PackageImports)</PackageImports>
         <IncludePath>$(BDSINCLUDE)\windows\vcl;$(IncludePath)</IncludePath>
-        <BCC_PCHName_Clang>agdv.pch.h</BCC_PCHName_Clang>
+        <BCC_PCHName_Clang>AGDv.pch.h</BCC_PCHName_Clang>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -158,11 +158,11 @@
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <Defines>NDEBUG;$(Defines)</Defines>
         <TASM_Debugging>None</TASM_Debugging>
+        <BCC_PCHInject>AGDv.pch.h</BCC_PCHInject>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
-        <BCC_PCHName_Clang>agdv.pch.h</BCC_PCHName_Clang>
         <LinkPackageImports>rtl.bpi;vcl.bpi;vclactnband.bpi;vclx.bpi;vclimg.bpi</LinkPackageImports>
         <BCC_UseClassicCompiler>false</BCC_UseClassicCompiler>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -171,26 +171,27 @@
         <VerInfo_Keys>CompanyName=Scorpio Designs;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.12;InternalName=AGDv;LegalCopyright=2018 Tony Thompson;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Programmed by Tony Thompson</VerInfo_Keys>
         <BCC_EnableBatchCompilation>true</BCC_EnableBatchCompilation>
         <BCC_InstructionSet>6</BCC_InstructionSet>
+        <BCC_PCHName_Clang>AGDv.pch.h</BCC_PCHName_Clang>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <BCC_PCHName_Clang>agdv.pch.h</BCC_PCHName_Clang>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
         <LinkPackageImports>rtl.bpi;vcl.bpi;vclactnband.bpi;vclx.bpi;vclimg.bpi</LinkPackageImports>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Debugger_RunParams>E:\ZXSpectrum\AGD\aticatac.agd</Debugger_RunParams>
         <Icon_MainIcon>AGDv.ico</Icon_MainIcon>
-        <VerInfo_Build>15</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Scorpio Designs;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.15;InternalName=AGDv;LegalCopyright=2018 Tony Thompson;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Programmed by Tony Thompson</VerInfo_Keys>
+        <VerInfo_Build>17</VerInfo_Build>
+        <BCC_PCHName_Clang>AGDv.pch.h</BCC_PCHName_Clang>
+        <VerInfo_Keys>CompanyName=Scorpio Designs;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.17;InternalName=AGDv;LegalCopyright=2018 Tony Thompson;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Programmed by Tony Thompson</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
-        <CppCompile Include="AGDv.cpp">
-            <BuildOrder>0</BuildOrder>
-        </CppCompile>
-        <PCHCompile Include="agdv.pch.h">
+        <PCHCompile Include="AGDv.pch.h">
             <BuildOrder>1</BuildOrder>
             <PCH>true</PCH>
         </PCHCompile>
+        <CppCompile Include="AGDx Viewer.cpp">
+            <BuildOrder>0</BuildOrder>
+        </CppCompile>
         <CppCompile Include="ErrorReporter.cpp">
             <DependentOn>ErrorReporter.h</DependentOn>
             <BuildOrder>7</BuildOrder>
@@ -265,7 +266,7 @@
                     <ProjectProperties Name="IndexFiles">False</ProjectProperties>
                 </ProjectProperties>
                 <Source>
-                    <Source Name="MainSource">AGDv.cpp</Source>
+                    <Source Name="MainSource">AGDx Viewer.cpp</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\DataExplorerDBXPluginEnt250.bpl">DBExpress Enterprise Data Explorer Integration</Excluded_Packages>
@@ -276,9 +277,9 @@
                 </Excluded_Packages>
             </CPlusPlusBuilder.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName=".\Win32\Debug\AGDv.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName=".\Win32\Debug\AGDx_Viewer.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>AGDv.exe</RemoteName>
+                        <RemoteName>AGDx_Viewer.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -322,21 +323,21 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName=".\Win64\Debug\AGDv.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName=".\Win64\Debug\AGDx_Viewer.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
-                        <RemoteName>AGDv.exe</RemoteName>
+                        <RemoteName>AGDx_Viewer.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName=".\Win64\Release\AGDv.exe" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName=".\Win64\Release\AGDx Viewer.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win64">
-                        <RemoteName>AGDv.exe</RemoteName>
+                        <RemoteName>AGDx_Viewer.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName=".\Win32\Release\AGDv.exe" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName=".\Win32\Release\AGDx_Viewer.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>AGDv.exe</RemoteName>
+                        <RemoteName>AGDx_Viewer.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

@@ -1,7 +1,7 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'AGDv'
+  Caption = 'AGDx Viewer'
   ClientHeight = 831
   ClientWidth = 994
   Color = clBtnFace
@@ -3724,6 +3724,10 @@ object frmMain: TfrmMain
     object Events: TTabSheet
       Caption = 'Events'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object memEvents: TMemo
         Left = 0
         Top = 0
@@ -3745,6 +3749,10 @@ object frmMain: TfrmMain
     object TabSheet1: TTabSheet
       Caption = 'Messages'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object memMessages: TMemo
         Left = 0
         Top = 0
@@ -4069,7 +4077,7 @@ object frmMain: TfrmMain
     Left = 220
     Top = 147
     Bitmap = {
-      494C010109006800A80020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109006800AC0020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
       000000000000000000000000000000000000000000050000000F000000150000
       0016000000160000001600000016000000160000001100000008000000050000

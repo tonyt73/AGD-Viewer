@@ -16,7 +16,7 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
          Application->MainFormOnTaskBar = true;
          TStyleManager::TrySetStyle("Glow");
          Application->CreateForm(__classid(TfrmMain), &frmMain);
-         Application->Run();
+		Application->Run();
     }
     catch (Exception &exception)
     {
