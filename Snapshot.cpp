@@ -35,11 +35,17 @@ bool __fastcall Snapshot::Load(const String& file)
                 {
                     m_Version = 46;
                     Location.Pointers = Location.PointersA;
+                    Location.Keys = Location.KeysA;
+                    Location.StartScreen = Location.StartScreenA;
+                    Location.JumpTable = Location.JumpTableA;
                 }
                 else
                 {
                     m_Version = 47;
                     Location.Pointers = Location.PointersB;
+                    Location.Keys = Location.KeysB;
+                    Location.StartScreen = Location.StartScreenB;
+                    Location.JumpTable = Location.JumpTableB;
                 }
                 return true;
             }
@@ -92,9 +98,15 @@ __fastcall ZXSpectrumZ80::ZXSpectrumZ80()
         m_Locations.Map = 31959 - m_Locations.StuffToSkip;
         m_Locations.Window = 32008 - m_Locations.StuffToSkip;
         m_Locations.NumberOfScreens = 32018 - m_Locations.StuffToSkip;
-        m_Locations.Pointers = 32059 - m_Locations.StuffToSkip;
         m_Locations.PointersA = 32057 - m_Locations.StuffToSkip;
         m_Locations.PointersB = 32059 - m_Locations.StuffToSkip;
+        m_Locations.Pointers = m_Locations.PointersB;
+        m_Locations.KeysA = 35331 - m_Locations.StuffToSkip;
+        m_Locations.KeysB = 35339 - m_Locations.StuffToSkip;
+        m_Locations.Keys = m_Locations.KeysB;
+        m_Locations.JumpTableA = 36217 - m_Locations.StuffToSkip;
+        m_Locations.JumpTableB = 36238 - m_Locations.StuffToSkip;
+        m_Locations.JumpTable = m_Locations.JumpTableB;
         m_Locations.StartScreenA = 33580 - m_Locations.StuffToSkip;
         m_Locations.StartScreenB = 33615 - m_Locations.StuffToSkip;
         m_Locations.SpriteSize = 35931 - m_Locations.StuffToSkip;
@@ -145,12 +157,18 @@ __fastcall ZXSpectrum48KSnapshot::ZXSpectrum48KSnapshot()
     m_Locations.Pointers = 32059 - m_Locations.StuffToSkip;
     m_Locations.PointersA = 32057 - m_Locations.StuffToSkip;
     m_Locations.PointersB = 32059 - m_Locations.StuffToSkip;
+    m_Locations.KeysA = 35331 - m_Locations.StuffToSkip;
+    m_Locations.KeysB = 35339 - m_Locations.StuffToSkip;
+    m_Locations.Keys = m_Locations.KeysB;
+    m_Locations.JumpTableA = 36217 - m_Locations.StuffToSkip;
+    m_Locations.JumpTableB = 36238 - m_Locations.StuffToSkip;
+    m_Locations.JumpTable = m_Locations.JumpTableB;
     m_Locations.StartScreenA = 33580 - m_Locations.StuffToSkip;
     m_Locations.StartScreenB = 33615 - m_Locations.StuffToSkip;
     m_Locations.SpriteSize = 35931 - m_Locations.StuffToSkip;
 }
 //---------------------------------------------------------------------------
-const unsigned int ZX_128K_SNAPSHOT_SIZE = 24 + 81920 + 3;
+const unsigned int ZX_128K_SNAPSHOT_SIZE = 131103;//24 + 81920 + 3;
 //---------------------------------------------------------------------------
 __fastcall ZXSpectrum128KSnapshot::ZXSpectrum128KSnapshot()
 : ZXSpectrum48KSnapshot()
@@ -173,8 +191,15 @@ __fastcall AmstradCPCSnapshot::AmstradCPCSnapshot()
     m_Locations.Pointers = 0;
     m_Locations.PointersA = 0;
     m_Locations.PointersB = 0;
+    m_Locations.Keys;
+    m_Locations.KeysA = 0;
+    m_Locations.KeysB = 0;
+    m_Locations.JumpTable;
+    m_Locations.JumpTableA = 0;
+    m_Locations.JumpTableB = 0;
     m_Locations.StartScreenA = 0;
     m_Locations.StartScreenB = 0;
+    m_Locations.StartScreen = 0;
     m_Locations.StuffToSkip = 0;
 }
 //---------------------------------------------------------------------------

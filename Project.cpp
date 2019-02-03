@@ -38,6 +38,7 @@ void __fastcall Project::Create(const String& name, const String& machine)
     AddFile("Lost game.event", "Text", "Event");
     AddFile("Completed game.event", "Text", "Event");
     AddFile("New high score.event", "Text", "Event");
+    AddFile("Collect block.event", "Text", "Event");
 }
 //---------------------------------------------------------------------------
 void __fastcall Project::Save()
@@ -77,7 +78,8 @@ void __fastcall Project::AddFile(const String& name, const String& type, const S
     {
         auto path = System::Path::Project;
         auto file = System::File::Combine(path, name);
-        System::File::WriteText(file, "; Created by AGDv import\r\n");
+        System::File::WriteText(file, "");
+        //System::File::WriteText(file, "; Created by AGDv import\r\n");
     }
 }
 //---------------------------------------------------------------------------

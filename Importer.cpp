@@ -1,5 +1,6 @@
 //---------------------------------------------------------------------------
 #include "agdv.pch.h"
+#include <algorithm>
 //---------------------------------------------------------------------------
 #include "Importer.h"
 //---------------------------------------------------------------------------
@@ -8,132 +9,25 @@
 // Equates for version 4.7
 enum
 {
-	INS_IF,
-	INS_MSU,
-	INS_MSD,
-	INS_MSL,
-	INS_MSR,
-	INS_ENDIF,
-	INS_CGU,
-	INS_CGD,
-	INS_CGL,
-	INS_CGR,
-	INS_LDU,
-	INS_LDD,
-	INS_DED,
-	INS_CUS,
-	INS_NUMBER,
-	INS_TO,
-	INS_FROM,
-	INS_BY,
-	INS_TYP,
-	INS_IMAGE,
-	INS_FRAME,
-	INS_X,
-	INS_Y,
-	INS_DIR,
-	INS_PMA,
-	INS_PMB,
-	INS_SCREEN,
-	INS_LIVES,
-	INS_A,
-	INS_B,
-	INS_C,
-	INS_D,
-	INS_E,
-	INS_F,
-	INS_G,
-	INS_H,
-	INS_I,
-	INS_J,
-	INS_K,
-	INS_L,
-	INS_M,
-	INS_N,
-	INS_O,
-	INS_P,
-	INS_Q,
-	INS_R,
-	INS_S,
-	INS_T,
-	INS_LINE,
-	INS_COLUMN,
-	INS_CLOCK,
-	INS_RND,
-	INS_OBJ,
-	INS_OPT,
-	INS_GOT,
-	INS_KEY,
-	INS_COLLISION,
-	INS_EQUAL_TO,
-	INS_GREATER_THAN,
-	INS_NOT_EQUAL_TO,
-	INS_LESS_THAN,
-	INS_LET,
-	INS_ANIMATE,
-	INS_ANIMBACK,
-	INS_PBL,
-	INS_NEX,
-	INS_RST,
-	INS_SPW,
-	INS_REM,
-	INS_GRN,
-	INS_ELSE,
-	INS_DSC,
-	INS_SCO,
-	INS_SND,
-	INS_BEP,
-	INS_CLS,
-	INS_BOR,
-	INS_CLR,
-	INS_DEL,
-	INS_MESSAGE,
-	INS_MENU,
-	INS_INV,
-	INS_KILL,
-	INS_ADD,
-	INS_SUB,
-	INS_DIS,
-	INS_SUP,
-	INS_SDW,
-	INS_SLF,
-	INS_SRG,
-	INS_PRE,
-	INS_JUMP,
-	INS_FALL,
-	INS_OTHER,
-	INS_SPAWNED,
-	INS_ORIGINAL,
-	INS_EGM,
-	INS_GET,
-	INS_PUT,
-	INS_DET,
-	INS_ASM,
-	INS_EXIT,
-	INS_REPEAT,
-	INS_ENDREPEAT,
-	INS_MULTIPLY,
-	INS_DIVDE,
-	INS_SPI,
-	INS_TRAIL,
-	INS_LASER,
-	INS_EXPLODE,
-	INS_FADE,
-	INS_TICKER,
-	INS_BIGMESSAGE,
-	INS_REDRAW,
-	INS_SIL,
-	INS_CON,
-	INS_DIG,
-	INS_STR,
-	INS_BIGSCORE,
-	INS_STOPFALL
-};
+	INS_IF, INS_MSU, INS_MSD, INS_MSL, INS_MSR, INS_ENDIF, INS_CGU, INS_CGD, INS_CGL, INS_CGR, INS_LDU, INS_LDD, INS_DED, INS_CUS, INS_NUMBER, INS_TO, INS_FROM, INS_BY, INS_TYP, INS_IMAGE, INS_FRAME, INS_X, INS_Y, INS_DIR, INS_PMA, INS_PMB, INS_SCREEN, INS_LIVES, INS_A, INS_B, INS_C, INS_D, INS_E,
+	INS_F, INS_G, INS_H, INS_I, INS_J, INS_K, INS_L, INS_M, INS_N, INS_O, INS_P, INS_Q, INS_R, INS_S, INS_T, INS_LINE, INS_COLUMN, INS_CLOCK, INS_RND, INS_OBJ, INS_OPT, INS_GOT, INS_KEY, INS_COLLISION, INS_EQUAL_TO, INS_GREATER_THAN, INS_NOT_EQUAL_TO, INS_LESS_THAN, INS_LET, INS_ANIMATE,
+	INS_ANIMBACK, INS_PBL, INS_NEX, INS_RST, INS_SPW, INS_REM, INS_GRN, INS_ELSE, INS_DSC, INS_SCO, INS_SND, INS_BEP, INS_CLS, INS_BOR, INS_CLR, INS_DEL, INS_MESSAGE, INS_MENU, INS_INV, INS_KILL, INS_ADD, INS_SUB, INS_DIS, INS_SUP, INS_SDW, INS_SLF, INS_SRG, INS_PRE, INS_JUMP, INS_FALL, INS_OTHER,
+	INS_SPAWNED, INS_ORIGINAL, INS_EGM, INS_GET, INS_PUT, INS_DET, INS_ASM, INS_EXIT, INS_REPEAT, INS_ENDREPEAT, INS_MULTIPLY, INS_DIVDE, INS_SPI, INS_TRAIL, INS_LASER, INS_EXPLODE, INS_FADE, INS_TICKER, INS_BIGMESSAGE, INS_REDRAW, INS_SIL, INS_CON, INS_DIG, INS_STR, INS_BIGSCORE, INS_STOPFALL
+} ;
 #define INS_ARGUMENTS			INS_CGU
+//---------------------------------------------------------------------------
+/* Table used to convert keycodes to ASCII. */
+const unsigned char cKeyTab[ 40 ] =
+{
+	'B', 'H', 'Y', '6', '5', 'T', 'G', 'V',
+	'N', 'J', 'U', '7', '4', 'R', 'F', 'C',
+	'M', 'K', 'I', '8', '3', 'E', 'D', 'X',
+	'.', 'L', 'O', '9', '2', 'W', 'S', 'Z',
+	32, 13,	'P', '0', '1', 'Q', 'A', '~'
+};
 //---------------------------------------------------------------------------
 const std::vector<String>  cKeyword =
 {
-	/* Some keywords. */
 	"IF",				// if.
 	"SPRITEUP",			// move sprite up.
 	"SPRITEDOWN",		// move sprite down.
@@ -231,8 +125,8 @@ const std::vector<String>  cKeyword =
 	"SCREENLEFT",		// left a screen.
 	"SCREENRIGHT",		// right a screen.
 	"WAITKEY",			// wait for keypress.
-	"JUMP 7",			// jump.
-	"FALL",				// fall.
+	"TABLEJUMP",		// jump.
+	"TABLEFALL",		// fall.
 	"OTHER",			// select second collision sprite.
 	"SPAWNED",			// select spawned sprite.
 	"ENDSPRITE",		// select original sprite.
@@ -240,7 +134,7 @@ const std::vector<String>  cKeyword =
 	"GET",				// get object.
 	"PUT",				// drop object.
 	"DETECTOBJ",		// detect object.
-	"; ASM",			// encode.
+	"ASM",			// encode.
 	"EXIT",				// exit.
 	"REPEAT",			// repeat.
 	"ENDREPEAT",		// endrepeat.
@@ -250,15 +144,15 @@ const std::vector<String>  cKeyword =
 	"TRAIL",			// leave a trail.
 	"LASER",			// shoot a laser.
 	"EXPLODE",			// start a shrapnel explosion.
-	"; FADE",			// fade unsupported.
+	"FADE",			// fade unsupported.
 	"TICKER",			// ticker message.
 	"MESSAGE",			// big message.
 	"REDRAW",			// redraw the play area.
 	"SILENCE",			// silence AY channels.
-	"WAITKEY",			// controlmenu unsupported.
-	"; DIG",			// dig unsupported.
+	"CONTROLMENU",			// controlmenu unsupported.
+	"DIG",				// dig.
 	"STAR",				// star.
-	"BIGSCORE",			// show score double-height.
+	"SHOWSCORE",			// show score double-height.
 	"STOPFALL"			// stop falling.
 };
 const String cEvent[] =
@@ -282,7 +176,8 @@ const String cEvent[] =
 	"KILLPLAYER",		// kill player.
 	"LOSTGAME",			// game over.
 	"COMPLETEDGAME",	// won game.
-	"NEWHIGHSCORE"		// new high score.
+	"NEWHIGHSCORE",		// new high score.
+	"COLLECTBLOCK"		// collected block.
 };
 //---------------------------------------------------------------------------
 __fastcall Importer::Importer()
@@ -292,9 +187,16 @@ __fastcall Importer::Importer()
 bool __fastcall Importer::Convert(const String& file)
 {
     auto ext = TPath::GetExtension(file).LowerCase();
+    bool loaded = false;
     if (ext == ".sna")
     {
         m_Snapshot = std::make_unique<ZXSpectrum48KSnapshot>();
+        loaded = m_Snapshot->Load(file);
+        if (m_Snapshot && !loaded)
+        {
+            m_Snapshot = std::make_unique<ZXSpectrum128KSnapshot>();
+            loaded = m_Snapshot->Load(file);
+        }
     }
     else if (ext == ".szx" || ext == ".zx-state")
     {
@@ -302,7 +204,7 @@ bool __fastcall Importer::Convert(const String& file)
         return false;
     }
 
-    if (m_Snapshot && m_Snapshot->Load(file))
+    if (loaded)
     {
         // get values
         m_ValueOf.WindowPosition.Y = m_Snapshot->Byte(m_Snapshot->Location.Window+0);
@@ -334,13 +236,16 @@ bool __fastcall Importer::Convert(const String& file)
         m_AddressOf.nObjects = m_AddressOf.Objects - m_Snapshot->Location.StuffToSkip;
         m_AddressOf.EventCode = m_Snapshot->Word(m_Snapshot->Location.Pointers + 20);
         m_AddressOf.nEventCode = m_AddressOf.EventCode - m_Snapshot->Location.StuffToSkip;
+        m_AddressOf.Keys = m_Snapshot->Location.Keys;
+        m_AddressOf.JumpTable = m_Snapshot->Location.JumpTable;
         m_AddressOf.Font = 	m_Snapshot->Location.Font;
-        m_AddressOf.StartScreenA = m_Snapshot->Location.StartScreenA;
-        m_AddressOf.StartScreenB = m_Snapshot->Location.StartScreenB;
+        m_AddressOf.StartScreen = m_Snapshot->Location.StartScreen;
         m_AddressOf.SpriteSize = m_Snapshot->Location.SpriteSize;
 
         ImportWindow();
         ImportMessages();
+        ImportKeys();
+        ImportJumpTable();
         ImportFont();
         ImportBlocks();
         ImportSprites();
@@ -348,6 +253,7 @@ bool __fastcall Importer::Convert(const String& file)
         ImportScreens();
         ImportMap();
         ImportEvents();
+        ImportJumpTable();
         return true;
     }
     return false;
@@ -366,22 +272,45 @@ void __fastcall Importer::ImportMessages()
 
 	while (nCount > 0)
 	{
-        m_Messages += "\"";
+        String msg = "";
 		while (m_Snapshot->Byte(addr) < 128)
 		{
             auto byte = m_Snapshot->Byte(addr++);
-            m_Messages += (char)byte;
+            msg += (char)byte;
 			if (byte == 34)						/* quotation marks? */
 			{
-                m_Messages += (char)byte;
+                msg += (char)byte;
 			}
 			nCount--;
 		}
+        msg += (char)(m_Snapshot->Byte(addr++) & 0x7F);
 
-        m_Messages += (char)(m_Snapshot->Byte(addr++) & 0x7F);
-        m_Messages += "\"ª";
+        m_Messages += "\"" + msg + "\"ª";
 		nCount--;
 	}
+}
+//---------------------------------------------------------------------------
+void __fastcall Importer::ImportKeys()
+{
+    m_Keys = "";
+    for (auto i = 0; i < 7; i++)
+    {
+        char chr = cKeyTab[m_Snapshot->Byte(m_AddressOf.Keys+i)];
+        m_Keys += String(chr);
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall Importer::ImportJumpTable()
+{
+    m_JumpTable = "";
+    auto jt = m_AddressOf.JumpTable;
+    auto j = 0;
+    do
+    {
+        j = m_Snapshot->Byte(jt++);
+        m_JumpTable += IntToStr(j) + " ";
+    }
+    while (j != 99);
 }
 //---------------------------------------------------------------------------
 void __fastcall Importer::ImportFont()
@@ -555,44 +484,38 @@ void __fastcall Importer::ImportScreens()
 //---------------------------------------------------------------------------
 void __fastcall Importer::ImportMap()
 {
+    const int MapWidth = 11;
+    const int MapHeight = 8;
 	auto nMap = m_AddressOf.nSpriteFrames - 100;
-	auto nFound = 0;
-	auto nStart = m_Snapshot->Version < 47 ? m_AddressOf.StartScreenA : m_AddressOf.StartScreenB;
+	auto nStart = m_AddressOf.StartScreen;
 	auto cMap = nStart;
 	auto nRoom = m_Snapshot->Byte(cMap);
 	cMap = nMap + nRoom;
-	m_Map += "map width 11 ";
-	m_Map += "startscreen " + IntToStr(m_Snapshot->Byte(cMap));
+	m_Map = "map startscreen " + IntToStr(m_Snapshot->Byte(cMap));
 	cMap = nMap;
 
-	unsigned char cLoc[11];
-	/* find first row of map with rooms in */
-	while (nFound == 0)
-	{
-		for (auto nRoom = 0; nRoom < 11; nRoom++)
-		{
-			cLoc[nRoom] = m_Snapshot->Byte(cMap++);
-			if (cLoc[nRoom] != 255)
-			{
-				nFound++;
-			}
-		}
-	}
-
-	/* write rooms until we find a row of empty slots. */
-	while (nFound > 0)
-	{
-		nFound = 0;
-		for (auto nRoom = 0; nRoom < 11; nRoom++)
-		{
-            m_Map += " " + IntToStr(cLoc[nRoom]);
-			cLoc[nRoom] = m_Snapshot->Byte(cMap++);
-			if (cLoc[nRoom] != 255)
-			{
-				nFound++;
-			}
-		}
-	}
+    auto left = 11;
+    auto right = 0;
+    auto top = 8;
+    auto bottom = 0;
+    // write out the entire map
+    for (auto y = 0; y < MapHeight; y++)
+    {
+        for (auto x = 0; x < MapWidth; x++ )
+        {
+            unsigned char room = m_Snapshot->Byte(cMap++);
+            m_Map += " " + IntToStr(room);
+            if (room != 255)
+            {
+                left = std::min(left, x);
+                right = std::max(right, x);
+                top = std::min(top, y);
+                bottom = std::max(bottom, y);
+            }
+        }
+    }
+    m_Map += " left " + IntToStr(left) + " right " + IntToStr(right);
+    m_Map += " top " + IntToStr(top) + " bottom " + IntToStr(bottom);
 }
 //---------------------------------------------------------------------------
 void __fastcall Importer::ConvertByte(unsigned char& cByte) const
@@ -652,7 +575,7 @@ void __fastcall Importer::NewLine()
 //---------------------------------------------------------------------------
 void __fastcall Importer::ImportEvents()
 {
-	auto nEvents = 20;
+	auto nEvents = 21;
 	auto nThisEvent = 0;
 	auto cNme = m_AddressOf.nEventCode + 1;							/* first byte is always end marker. */
 

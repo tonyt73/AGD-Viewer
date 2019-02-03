@@ -3628,6 +3628,10 @@ object frmMain: TfrmMain
     TabWidth = 120
     object tabImages: TTabSheet
       Caption = 'Images'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object sbxView: TScrollBox
         Left = 0
         Top = 0
@@ -3646,6 +3650,7 @@ object frmMain: TfrmMain
           Height = 542
           Align = alTop
           OnMouseMove = imgViewMouseMove
+          ExplicitLeft = -3
           ExplicitTop = 3
         end
         object imgZXFont: TImage
@@ -3717,7 +3722,9 @@ object frmMain: TfrmMain
           Top = 0
           Width = 975
           Height = 542
-          OnMouseMove = imgViewMouseMove
+          OnMouseDown = imgMapMouseDown
+          OnMouseMove = imgMapMouseMove
+          OnMouseUp = imgMapMouseUp
         end
       end
     end
@@ -3728,11 +3735,81 @@ object frmMain: TfrmMain
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
-      object memEvents: TMemo
+      object ToolBar2: TToolBar
         Left = 0
         Top = 0
         Width = 986
-        Height = 548
+        AutoSize = True
+        ButtonHeight = 32
+        ButtonWidth = 32
+        Caption = 'ToolBar2'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        object Label2: TLabel
+          Left = 0
+          Top = 0
+          Width = 57
+          Height = 32
+          Align = alLeft
+          AutoSize = False
+          Caption = ' Event'
+          Layout = tlCenter
+        end
+        object cmbEvent: TComboBox
+          Left = 57
+          Top = 4
+          Width = 145
+          Height = 24
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 0
+          Text = 'PLAYER'
+          OnChange = cmbEventChange
+          Items.Strings = (
+            'PLAYER'
+            'SPRITE TYPE 1'
+            'SPRITE TYPE 2'
+            'SPRITE TYPE 3'
+            'SPRITE TYPE 4'
+            'SPRITE TYPE 5'
+            'SPRITE TYPE 6'
+            'SPRITE TYPE 7'
+            'SPRITE TYPE 8'
+            'INIT SPRITE'
+            'MAIN LOOP 1'
+            'MAIN LOOP 2'
+            'INTRO MENU'
+            'GAME INIT'
+            'RESTART SCREEN'
+            'FELL TOO FAR'
+            'KILL PLAYER'
+            'LOST GAME'
+            'COMPLETED GAME'
+            'NEW HIGH SCORE')
+        end
+        object ToolButton11: TToolButton
+          Left = 202
+          Top = 0
+          Width = 8
+          Caption = 'ToolButton11'
+          Style = tbsSeparator
+        end
+        object ToolButton13: TToolButton
+          Left = 210
+          Top = 0
+          Caption = 'ToolButton13'
+        end
+      end
+      object txtEvents: TRichEdit
+        Left = 0
+        Top = 32
+        Width = 986
+        Height = 516
         Align = alClient
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
@@ -3740,10 +3817,12 @@ object frmMain: TfrmMain
         Font.Name = 'Courier New'
         Font.Style = []
         Lines.Strings = (
-          '')
+          'txtEvents')
         ParentFont = False
         ScrollBars = ssBoth
-        TabOrder = 0
+        TabOrder = 1
+        WordWrap = False
+        Zoom = 100
       end
     end
     object TabSheet1: TTabSheet
@@ -3909,13 +3988,11 @@ object frmMain: TfrmMain
       object Label1: TLabel
         Left = 1
         Top = 1
-        Width = 959
-        Height = 33
+        Width = 36
+        Height = 13
         Align = alClient
         Caption = ' Report'
         Layout = tlCenter
-        ExplicitWidth = 36
-        ExplicitHeight = 13
       end
       object SpeedButton1: TSpeedButton
         Left = 960
@@ -4077,7 +4154,7 @@ object frmMain: TfrmMain
     Left = 220
     Top = 147
     Bitmap = {
-      494C010109006800AC0020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109006800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
       000000000000000000000000000000000000000000050000000F000000150000
       0016000000160000001600000016000000160000001100000008000000050000

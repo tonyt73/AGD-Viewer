@@ -31,6 +31,10 @@ __fastcall GameScreen::GameScreen(const String& data)
                 else if (i == 1)
                 {
                     spritePos.Index = StrToInt(token);
+                    if (spritePos.Index == 90)
+                    {
+                        spritePos.Index = 0;
+                    }
                     i = 2;
                 }
                 else if (i == 2)
@@ -71,8 +75,8 @@ void __fastcall GameScreen::Draw(int room, int x, int y, TBitmap* bitmap, int sc
     auto sy = y;
     auto bx = 0;
     auto by = 0;
-    auto wx = window.x * 8 * scalar;
-    auto wy = window.y * 8 * scalar;
+    auto wx = window.x * 8;
+    auto wy = window.y * 8;
     auto bw = blocks[0]->Width * scalar;
     auto bh = blocks[0]->Height * scalar;
     for (const auto& block : m_Blocks)
@@ -91,11 +95,15 @@ void __fastcall GameScreen::Draw(int room, int x, int y, TBitmap* bitmap, int sc
         }
     }
 
-    for (const auto& sprite : m_Sprites)
+    for (auto& sprite : m_Sprites)
     {
+        if (sprite.Index >= sprites.size())
+        {
+            sprite.Index = 0;
+        }
         if (sprite.Index < sprites.size())
         {
-            sprites[sprite.Index]->Draw(sx + (sprite.Position.X * scalar) - wx, sy + (sprite.Position.Y * scalar) - wy, bitmap, scalar, 0);
+			sprites[sprite.Index]->Draw(sx + ((sprite.Position.X - wx) * scalar), sy + ((sprite.Position.Y - wy) * scalar), bitmap, scalar, 0);
         }
         else
         {
@@ -108,7 +116,7 @@ void __fastcall GameScreen::Draw(int room, int x, int y, TBitmap* bitmap, int sc
         auto image = dynamic_cast<ImageObject*>(object.get());
         if (image != nullptr && image->Room == room && image->Room != -1)
         {
-            image->Draw(sx + (image->Position.X * scalar) - wx, sy + (image->Position.Y * scalar) - wy, bitmap, scalar, 0);
+			image->Draw(sx + ((image->Position.X - wx) * scalar), sy + ((image->Position.Y - wy) * scalar), bitmap, scalar, 0);
         }
     }
 }

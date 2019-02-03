@@ -36,13 +36,14 @@ private:
         unsigned int    nAYSoundFx;
         unsigned int    Messages;
         unsigned int    nMessages;
+        unsigned int    Keys;
+        unsigned int    JumpTable;
         unsigned int    Objects;
         unsigned int    nObjects;
         unsigned int    EventCode;
         unsigned int    nEventCode;
         unsigned int    Font;
-        unsigned int    StartScreenA;
-        unsigned int    StartScreenB;
+        unsigned int    StartScreen;
         unsigned int    SpriteSize;
     };
 
@@ -57,7 +58,9 @@ private:
     String                      m_Screens;
     String                      m_Map;
     String                      m_Messages;
+    String                      m_Keys;
     String                      m_Events;
+    String                      m_JumpTable;
     unsigned int                m_SpriteHeight;
 
     int                         nTabs;
@@ -71,6 +74,8 @@ private:
     void        __fastcall  ConvertByte(unsigned char& cByte) const;
     void        __fastcall  ImportWindow();
     void        __fastcall  ImportMessages();
+    void        __fastcall  ImportKeys();
+    void        __fastcall  ImportJumpTable();
     void        __fastcall  ImportEvents();
     void        __fastcall  ImportFont();
     void        __fastcall  ImportBlocks();
@@ -92,7 +97,9 @@ public:
     String      __property  Screens = { read = m_Screens };
     String      __property  Map = { read = m_Map };
     String      __property  Messages = { read = m_Messages };
+    String      __property  Keys = { read = m_Keys };
     String      __property  Events = { read = m_Events };
+    String      __property  JumpTable = { read = m_JumpTable };
    unsigned int __property  SpriteHeight = { read = m_SpriteHeight };
 };
 //---------------------------------------------------------------------------

@@ -20,8 +20,15 @@ protected:
         unsigned int    Pointers;
         unsigned int    PointersA;
         unsigned int    PointersB;
+        unsigned int    Keys;
+        unsigned int    KeysA;
+        unsigned int    KeysB;
+        unsigned int    JumpTable;
+        unsigned int    JumpTableA;
+        unsigned int    JumpTableB;
         unsigned int    StartScreenA;
         unsigned int    StartScreenB;
+        unsigned int    StartScreen;
         unsigned int    SpriteSize;
         unsigned int    StuffToSkip;
     };

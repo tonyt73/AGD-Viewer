@@ -7,17 +7,23 @@
 //---------------------------------------------------------------------------
 __fastcall Map::Map(const String& data)
 {
+    for (auto y = 0; y < 16; y++)
+        for (auto x = 0; x < 16; x++)
+            m_MapData[x][y] = 255;
     try
     {
         auto tokens = SplitString(data.Trim(), " ");
         String prevToken;
         auto storeScreens = false;
+        auto x = 0;
+        auto y = 0;
+        auto width = 0;
+        auto size = 0;
         for (auto token : tokens)
         {
-            if (prevToken.LowerCase() == "width")
+            if (token == "left" || token == "right" || token == "top" || token == "bottom")
             {
-                m_Width = StrToInt(token.Trim());
-                g_ErrorReporter.Add("Info: Map - Width: " + IntToStr(m_Width));
+                storeScreens = false;
             }
             else if (prevToken.LowerCase() == "startscreen")
             {
@@ -27,13 +33,35 @@ __fastcall Map::Map(const String& data)
             }
             else if (storeScreens && token.Trim() != "")
             {
-                m_MapData.push_back(StrToInt(token.Trim()));
+                m_MapData[x][y] = StrToInt(token.Trim());
+                size += m_MapData[x][y] == 255 ? 0 : 1;
+                if (++x == 11)
+                {
+                    x = 0;
+                    y++;
+                }
+            }
+            else if (prevToken.LowerCase() == "left")
+            {
+                m_Rect.Left = StrToInt(token);
+            }
+            else if (prevToken.LowerCase() == "right")
+            {
+                m_Rect.Right = StrToInt(token);
+            }
+            else if (prevToken.LowerCase() == "top")
+            {
+                m_Rect.Top = StrToInt(token);
+            }
+            else if (prevToken.LowerCase() == "bottom")
+            {
+                m_Rect.Bottom = StrToInt(token);
             }
             prevToken = token.Trim();
         }
-        int size = m_MapData.size();
-        m_Height = size / m_Width;
-        g_ErrorReporter.Add("Info: Map - Screens: " + IntToStr(size) + ", " + IntToStr(m_Width) + "x" + IntToStr(m_Height));
+        m_Width = 16;
+        m_Height = 16;
+        g_ErrorReporter.Add("Info: Map - Screens: " + IntToStr(size) + ", " + IntToStr((int)m_Rect.Width()) + "x" + IntToStr((int)m_Rect.Height()));
     }
     catch(...)
     {
@@ -49,26 +77,41 @@ void __fastcall Map::Draw(TBitmap* bitmap, int scalar, const Window& window, con
         auto sw = window.w * blocks[0]->Width * scalar;
         auto sh = window.h * blocks[0]->Height * scalar;
         bitmap->Width = sw * m_Width;
-        bitmap->Height = sh * (m_MapData.size() / m_Width);
+        bitmap->Height = sh *  m_Height;
         // clear the map
         BitBlt(bitmap->Canvas->Handle, 0, 0, bitmap->Width, bitmap->Height, NULL, 0, 0, BLACKNESS);
         auto x = 0;
         auto y = 0;
-        auto w = 0;
-        for (const auto& screen : m_MapData)
+        //for (const auto& screen : m_MapData)
+        for (auto y = 0; y < 16; y++)
         {
-            if (screen != 255)
+            for (auto x = 0; x < 16; x++)
             {
-                screens[screen]->Draw(screen, x, y, bitmap, scalar, blocks, objects, sprites, window);
-            }
-            x += sw;
-            if (++w == m_Width)
-            {
-                w = 0;
-                x = 0;
-                y += sh;
+                auto screen = m_MapData[x][y];
+                if (screen != 255)
+                {
+                    screens[screen]->Draw(screen, x, y, bitmap, scalar, blocks, objects, sprites, window);
+                }
             }
         }
     }
 }
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+TPoint __fastcall Map::GetRoomPt(int room)
+{
+    TPoint pt(0,0);
+    for (auto y = 0; y < 16; y++)
+    {
+        for (auto x = 0; x < 16; x++)
+        {
+            if (m_MapData[x][y] == room)
+            {
+                pt.X = x;
+                pt.Y = y;
+                break;
+            }
+        }
+    }
+    return pt;
+}
+// ---------------------------------------------------------------------------

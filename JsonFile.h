@@ -24,7 +24,6 @@ protected:
     // the loader will set the value based on the property type
     std::map<String, void*>     m_PropertyMap;
 
-protected:
     void            __fastcall  Open(const String& file);
     void            __fastcall  Close();
     // write (on save)
