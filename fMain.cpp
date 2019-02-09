@@ -244,7 +244,7 @@ void __fastcall TfrmMain::LoadAGDFile(const String & file)
                 auto tline = line + "\r\n";
                 auto lline = tline.LowerCase();
                 // remove comments
-                auto cPos = tline.Pos("ª");
+                auto cPos = tline.Pos(";");
                 if (cPos > 0)
                 {
                     tline = tline.SubString(1, cPos - 1);
@@ -505,7 +505,7 @@ void __fastcall TfrmMain::ConvertScreen(const String & data)
     try
     {
         // convert the data
-        m_Screens.push_back(std::move(std::make_unique <GameScreen> (data)));
+        m_Screens.push_back(std::move(std::make_unique<GameScreen>(data, m_Screens.size())));
     }
     catch (...)
     {
@@ -832,35 +832,35 @@ void __fastcall TfrmMain::ExportAGDXProject()
         {
             auto file = System::File::Combine(path, EventToFileMap[event] + ".event");
             System::File::AppendText(file, ";" + code);
-            // read the file back
-            auto lines = System::File::ReadLines(file);
-            // replace SCREEN = with new reference
-            auto newFile = String();
-            for (auto line : lines)
-            {
-                auto p = line.UpperCase().Pos("SCREEN");
-                if (p > 0)
-                {
-                    p += 6;
-                    // find the start of the room number
-                    for (auto i = p; i <= line.Length(); i++)
-                    {
-                        if (IsNumber(line[i]))
-                        {
-                            auto roomNum = StrToInt(line.SubString(i, line.Length()));
-                            // replace the room number with the new room x, y
-                            auto roomPt = m_Map->GetRoomPt(roomNum);
-                            auto roomCoord = " " + IntToStr((int)roomPt.X) + ", " + IntToStr((int)roomPt.Y);
-                            line = line.SubString(1, i - 1) + roomCoord;
-                            break;
-                        }
-                    }
-                }
-                newFile += line + "\r\n";
-            }
-            System::File::WriteText(file, newFile);
-        }
-    }
+//            // read the file back
+//            auto lines = System::File::ReadLines(file);
+//            // replace SCREEN = with new reference
+//            auto newFile = String();
+//            for (auto line : lines)
+//            {
+//                auto p = line.UpperCase().Pos("SCREEN");
+//                if (p > 0)
+//                {
+//                    p += 6;
+//                    // find the start of the room number
+//                    for (auto i = p; i <= line.Length(); i++)
+//                    {
+//                        if (IsNumber(line[i]))
+//                        {
+//                            auto roomNum = StrToInt(line.SubString(i, line.Length()));
+//                            // replace the room number with the new room x, y
+//                            auto roomPt = m_Map->GetRoomPt(roomNum);
+//                            auto roomCoord = " " + IntToStr((int)roomPt.X) + ", " + IntToStr((int)roomPt.Y);
+//                            line = line.SubString(1, i - 1) + roomCoord;
+//                            break;
+//                        }
+//                    }
+//                }
+//                newFile += line + "\r\n";
+//			}
+//			System::File::WriteText(file, newFile);
+		}
+	}
     // save images
     // font
     if (m_Font.size() == 1)
@@ -897,16 +897,11 @@ void __fastcall TfrmMain::ExportAGDXProject()
         auto i = 0;
         for (auto &obj : m_Objects)
         {
-            auto object = dynamic_cast<ImageObject*>(obj.get());
-            object->Id        = ++id;
+            auto object    = dynamic_cast<ImageObject*>(obj.get());
+            object->Id     = ++id;
             auto   file    = System::File::Combine(path, "Object " + IntToStr(++i) + ".json");
             String content = "{\r\n  \"Document\": {\r\n    \"RefId\": " + IntToStr(object->Id) + "\r\n  },\r\n  \"Image\": {\r\n    \"Width\": 16,\r\n    \"Height\": 16,\r\n";
-            auto roomPt = TPoint(object->Room, object->Room);
-            if (object->Room < 254)
-            {
-                roomPt = m_Map->GetRoomPt(object->Room);
-            }
-            content += "    \"Room\": {\r\n      \"X\": " + IntToStr((int)roomPt.X) + ",\r\n      \"Y\": " + IntToStr((int)roomPt.Y) + "\r\n    },\r\n";
+            content += "    \"RoomIndex\": " + IntToStr(object->Room) + ",\r\n";
             content += "    \"Position\": {\r\n      \"X\": " + IntToStr((int)object->Position.X - wx) + ",\r\n      \"Y\": " + IntToStr((int)object->Position.Y - wy) + "\r\n    },\r\n";
             content += "    \"State\": " + IntToStr(object->Room < 254 ? 0 : (object->Room == 254 ? 1 : 2)) + ",\r\n";
             content += "    \"Frames\": [\r\n";
@@ -936,7 +931,7 @@ void __fastcall TfrmMain::ExportAGDXProject()
         {
             obj->Id        = ++id;
             auto   file    = System::File::Combine(path, "Sprite " + IntToStr(++i) + ".json");
-            String content = "{\r\n  \"Document\": {\r\n    \"RefId\": " + IntToStr(obj->Id) + "\r\n  },\r\n  \"Image\": {\r\n    \"TypeId\": " + IntToStr(obj->Type) + ",\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
+            String content = "{\r\n  \"Document\": {\r\n    \"RefId\": " + IntToStr(obj->Id) + "\r\n  },\r\n  \"Image\": {\r\n    \"Width\": " + IntToStr(obj->Width) + ",\r\n    \"Height\": " + IntToStr(obj->Height) + ",\r\n    \"Frames\": [\r\n";
             BitmapData data;
             obj->GetBitmapData(data);
             auto stride = 2 * obj->Height;
@@ -995,13 +990,9 @@ void __fastcall TfrmMain::ExportAGDXProject()
     if (m_Map->Width > 0 && m_Map->Height > 0)
     {
         auto file = System::File::Combine(path, "Tile Map.json");
-        auto sr   = m_Map->GetRoomPt(m_Map->StartScreen);
         String content = "{\r\n  \"Map\": {"
-                          "\r\n        \"StartLocation\": {"
-                          "\r\n              \"X\": " + IntToStr((int)sr.X) +
-                         ",\r\n              \"Y\": " + IntToStr((int)sr.Y) +
-                          "\r\n        }" +
-                         ",\r\n        \"Entities\": [\r\n";
+                          "\r\n        \"StartLocation\": " + IntToStr(m_Map->StartScreen) + ","
+                          "\r\n        \"Entities\": [\r\n";
         // output each rooms entity list
         auto screensDone = std::vector<int>();
         auto rx = 0;
@@ -1041,15 +1032,36 @@ void __fastcall TfrmMain::ExportAGDXProject()
                 }
             }
         }
+        // terminate the array
+        content = content.SubString(1, content.Length() - 3);
+        content += "\r\n    ],\r\n";
+        // output the screen index mapping
+        content += "    \"RoomMapping\": {";
+        content += "\r\n        \"Width\": 16,";
+        content += "\r\n        \"Height\": 16,";
+        content += "\r\n        \"Indexes\": [";
+
+        for (auto y = 0; y < 16; y++)
+        {
+            for (auto x = 0; x < 16; x++)
+            {
+                content += IntToStr(m_Map->m_MapData[x][y]);
+                if (y != 15 || x != 15)
+                {
+                    content += ", ";
+                }
+            }
+        }
+        content += "]";
+
+        content += "\r\n    }\r\n}";
+        System::File::WriteText(file, content);
+        project->AddFile("Tile Map.json", "Map", "Tiled");
 
         // TODO: Write Controls document
 
         // TODO: Write JumpTable document
 
-        content = content.SubString(1, content.Length() - 3);
-        content += "\r\n    ]\r\n  }\r\n}";
-        System::File::WriteText(file, content);
-        project->AddFile("Tile Map.json", "Map", "Tiled");
         project->Save();
     }
 }
@@ -1064,7 +1076,7 @@ void __fastcall TfrmMain::OutputScreen(String& content, int room, int rx, int ry
         {
             auto x = ((rx * m_Window.w) + bx) * 8;
             auto y = ((ry * m_Window.h) + by) * 8;
-            content += "      {\r\n        \"X\":" + IntToStr(x) + ",\r\n        \"Y\":" + IntToStr(y) + ",\r\n        \"RefId\":" + IntToStr(m_Blocks[block]->Id) + "\r\n      }";
+            content += "        {\r\n          \"X\":" + IntToStr(x) + ",\r\n          \"Y\":" + IntToStr(y) + ",\r\n          \"RefId\":" + IntToStr(m_Blocks[block]->Id) + "\r\n        }";
             content += ",\r\n";
         }
         if (++bx == m_Window.w)
@@ -1073,21 +1085,25 @@ void __fastcall TfrmMain::OutputScreen(String& content, int room, int rx, int ry
             ++by;
         }
     }
+
+    auto mapRect = TRect(m_Window.x * 8, m_Window.y * 8, (m_Window.x + m_Window.w) * 8, (m_Window.y + m_Window.h) * 8);
     for (const auto &sprite : m_Screens[room]->m_Sprites)
     {
         if (sprite.Index < m_Sprites.size())
         {
-            int x = ((rx * m_Window.w) + ((sprite.Position.X / 8) - m_Window.x)) * 8;
-            int y = ((ry * m_Window.h) + ((sprite.Position.Y / 8) - m_Window.y)) * 8;
+            int dx = ((sprite.Position.X / 8) - m_Window.x) * 8;
+            int dy = ((sprite.Position.Y / 8) - m_Window.y) * 8;
+            int x = (rx * m_Window.w * 8) + dx;
+            int y = (ry * m_Window.h * 8) + dy;
+            auto locked = dx < mapRect.Left  || (dx + 16) > mapRect.Right || dy < mapRect.Top || (dy + 16) > mapRect.Bottom;
             content += "      {\r\n        \"X\":" + IntToStr(x) +
                        ",\r\n        \"Y\":" + IntToStr(y) +
-                       ",\r\n        \"RefId\":" + IntToStr(m_Sprites[sprite.Index]->Id) +
-                       ",\r\n        \"SpriteType\":" + IntToStr(sprite.Type) +
-                       ",\r\n        \"Room\": {" +
-                       "\r\n            \"Locked\": true" +
-                       ",\r\n            \"X\": " + IntToStr(rx) +
-                       ",\r\n            \"Y\": " + IntToStr(ry) +
-                       "\r\n        }" +
+					   ",\r\n        \"RefId\":" + IntToStr(m_Sprites[sprite.Index]->Id) +
+					   ",\r\n        \"SpriteType\":" + IntToStr(sprite.Type) +
+					   ",\r\n        \"Room\": {" +
+					   "\r\n            \"Locked\": " + (locked ? "true" : "false") +
+					   ",\r\n            \"Index\": " + IntToStr(sprite.ScreenIndex) +
+					   "\r\n        }" +
                        "\r\n      }";
             content += ",\r\n";
         }
@@ -1227,7 +1243,6 @@ void __fastcall TfrmMain::ExportAGDFile()
     // map
     content += "\r\nMAP WIDTH " + IntToStr(m_Map->Rect.Width()+ 3) + "\r\n    STARTSCREEN " + IntToStr(m_Map->StartScreen) + "\r\n    ";
     auto i = 0;
-    //for (auto d : m_Map->m_MapData)
     for (auto y = m_Map->Rect.Top; y <= m_Map->Rect.Bottom; y++)
     {
         for (auto x = m_Map->Rect.Left - 1; x <= m_Map->Rect.Right + 1; x++)

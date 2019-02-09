@@ -134,7 +134,7 @@ const std::vector<String>  cKeyword =
 	"GET",				// get object.
 	"PUT",				// drop object.
 	"DETECTOBJ",		// detect object.
-	"ASM",			// encode.
+	"ASM",			    // encode.
 	"EXIT",				// exit.
 	"REPEAT",			// repeat.
 	"ENDREPEAT",		// endrepeat.
@@ -144,12 +144,12 @@ const std::vector<String>  cKeyword =
 	"TRAIL",			// leave a trail.
 	"LASER",			// shoot a laser.
 	"EXPLODE",			// start a shrapnel explosion.
-	"FADE",			// fade unsupported.
+	"FADE",			    // fade unsupported.
 	"TICKER",			// ticker message.
 	"MESSAGE",			// big message.
 	"REDRAW",			// redraw the play area.
 	"SILENCE",			// silence AY channels.
-	"CONTROLMENU",			// controlmenu unsupported.
+	"WAITKEY",			// waitkey
 	"DIG",				// dig.
 	"STAR",				// star.
 	"SHOWSCORE",			// show score double-height.
@@ -205,7 +205,8 @@ bool __fastcall Importer::Convert(const String& file)
     }
 
     if (loaded)
-    {
+	{
+        Version = m_Snapshot->Version;
         // get values
         m_ValueOf.WindowPosition.Y = m_Snapshot->Byte(m_Snapshot->Location.Window+0);
         m_ValueOf.WindowPosition.X = m_Snapshot->Byte(m_Snapshot->Location.Window+1);
@@ -253,7 +254,6 @@ bool __fastcall Importer::Convert(const String& file)
         ImportScreens();
         ImportMap();
         ImportEvents();
-        ImportJumpTable();
         return true;
     }
     return false;
@@ -575,123 +575,126 @@ void __fastcall Importer::NewLine()
 //---------------------------------------------------------------------------
 void __fastcall Importer::ImportEvents()
 {
+	auto nMaxEvents = 20;//Version == 46 ? 20 : 21;
 	auto nEvents = 21;
 	auto nThisEvent = 0;
 	auto cNme = m_AddressOf.nEventCode + 1;							/* first byte is always end marker. */
 
-    auto cNewLine = 1;
+	auto cNewLine = 1;
 	while (nEvents-- > 0)
 	{
-        cNewLine = 1;
+		cNewLine = 1;
 		nTabs = 0;
-	    NewLine();
+		NewLine();
 		WriteText("EVENT ");
-        WriteText(cEvent[nThisEvent]);
-		nThisEvent++;
-		auto cByte = m_Snapshot->Byte(cNme++);
-		ConvertByte(cByte);
-		auto nPrintMode = 0;
-
-		while (cByte < 255)
+		WriteText(cEvent[nThisEvent]);
+		if (nThisEvent++ < nMaxEvents)
 		{
-			if (cNewLine > 0 && cByte != INS_NUMBER)
+			auto cByte = m_Snapshot->Byte(cNme++);
+			ConvertByte(cByte);
+			auto nPrintMode = 0;
+
+			while (cByte < 255)
 			{
-				cNewLine = 0;
-                NewLine();
-                auto nIndents = nTabs;
-
-				while (nIndents-- > 0)
+				if (cNewLine > 0 && cByte != INS_NUMBER)
 				{
-					WriteText( "    " );
-				}
-
-				if (nPrintMode > 0)
-				{
-					nPrintMode = 0;
-					WriteText( "PRINTMODE 0" );
+					cNewLine = 0;
 					NewLine();
-					for (auto nIndents = 0; nIndents < nTabs; nIndents++)
+					auto nIndents = nTabs;
+
+					while (nIndents-- > 0)
 					{
 						WriteText( "    " );
 					}
-				}
-			}
-			else
-			{
-				WriteText(" ");
-			}
 
-			if (cByte == INS_NUMBER)
-			{
-				cByte = m_Snapshot->Byte(cNme++);
-				WriteText(IntToStr(cByte));
-			}
-			else
-			{
-				CodeLine(cByte, m_Snapshot->Byte(cNme));
-			}
-			if (cByte == INS_KEY)
-			{
-				cByte = m_Snapshot->Byte(cNme++);
-				if (cByte == INS_NUMBER)
-				{
-					WriteText( " " );
-					cByte = m_Snapshot->Byte(cNme++);
-					switch(cByte)
+					if (nPrintMode > 0)
 					{
-						case 0:
-							WriteText( "RIGHT" );
-							break;
-						case 1:
-							WriteText( "LEFT" );
-							break;
-						case 2:
-							WriteText( "DOWN" );
-							break;
-						case 3:
-							WriteText( "UP" );
-							break;
-						case 4:
-							WriteText( "FIRE" );
-							break;
-						case 5:
-							WriteText( "FIRE2" );
-							break;
-						case 6:
-							WriteText( "FIRE3" );
-							break;
-						default:
-							WriteText(IntToStr(cByte) + "   ; warning - unrecognised key");
-							break;
+						nPrintMode = 0;
+						WriteText( "PRINTMODE 0" );
+						NewLine();
+						for (auto nIndents = 0; nIndents < nTabs; nIndents++)
+						{
+							WriteText( "    " );
+						}
 					}
 				}
 				else
 				{
-					cNme--;
+					WriteText(" ");
 				}
-			}
 
-			cByte = m_Snapshot->Byte(cNme++);
-			ConvertByte(cByte);
-
-			switch( cByte )
-			{
-				case INS_ELSE:
-				case INS_ENDIF:
-				case INS_ENDREPEAT:
-					nTabs--;
-					if (nTabs < 0)
+				if (cByte == INS_NUMBER)
+				{
+					cByte = m_Snapshot->Byte(cNme++);
+					WriteText(IntToStr(cByte));
+				}
+				else
+				{
+					CodeLine(cByte, m_Snapshot->Byte(cNme));
+				}
+				if (cByte == INS_KEY)
+				{
+					cByte = m_Snapshot->Byte(cNme++);
+					if (cByte == INS_NUMBER)
 					{
-						nTabs = 0;
-						NewLine();
-						WriteText( "; warning - ENDIF without IF?" );
+						WriteText( " " );
+						cByte = m_Snapshot->Byte(cNme++);
+						switch(cByte)
+						{
+							case 0:
+								WriteText( "RIGHT" );
+								break;
+							case 1:
+								WriteText( "LEFT" );
+								break;
+							case 2:
+								WriteText( "DOWN" );
+								break;
+							case 3:
+								WriteText( "UP" );
+								break;
+							case 4:
+								WriteText( "FIRE" );
+								break;
+							case 5:
+								WriteText( "FIRE2" );
+								break;
+							case 6:
+								WriteText( "FIRE3" );
+								break;
+							default:
+								WriteText(IntToStr(cByte) + "   ; warning - unrecognised key");
+								break;
+						}
 					}
-					break;
-			}
+					else
+					{
+						cNme--;
+					}
+				}
 
-			if ((cByte < INS_ARGUMENTS) || (cByte >= INS_LET && cByte != INS_BY))
-			{
-				cNewLine++;
+				cByte = m_Snapshot->Byte(cNme++);
+				ConvertByte(cByte);
+
+				switch( cByte )
+				{
+					case INS_ELSE:
+					case INS_ENDIF:
+					case INS_ENDREPEAT:
+						nTabs--;
+						if (nTabs < 0)
+						{
+							nTabs = 0;
+							NewLine();
+							WriteText( "; warning - ENDIF without IF?" );
+						}
+						break;
+				}
+
+				if ((cByte < INS_ARGUMENTS) || (cByte >= INS_LET && cByte != INS_BY))
+				{
+					cNewLine++;
+				}
 			}
 		}
 		NewLine();

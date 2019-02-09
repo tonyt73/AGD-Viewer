@@ -191,10 +191,10 @@ __fastcall AmstradCPCSnapshot::AmstradCPCSnapshot()
     m_Locations.Pointers = 0;
     m_Locations.PointersA = 0;
     m_Locations.PointersB = 0;
-    m_Locations.Keys;
-    m_Locations.KeysA = 0;
+    m_Locations.Keys= 0;
+	m_Locations.KeysA = 0;
     m_Locations.KeysB = 0;
-    m_Locations.JumpTable;
+    m_Locations.JumpTable = 0;
     m_Locations.JumpTableA = 0;
     m_Locations.JumpTableB = 0;
     m_Locations.StartScreenA = 0;
