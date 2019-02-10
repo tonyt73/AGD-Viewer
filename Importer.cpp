@@ -134,7 +134,7 @@ const std::vector<String>  cKeyword =
 	"GET",				// get object.
 	"PUT",				// drop object.
 	"DETECTOBJ",		// detect object.
-	"ASM",			    // encode.
+	"; ASM",			    // encode.
 	"EXIT",				// exit.
 	"REPEAT",			// repeat.
 	"ENDREPEAT",		// endrepeat.
