@@ -1,9 +1,9 @@
 object frmMain: TfrmMain
   Left = 0
   Top = 0
-  Caption = 'AGDx Viewer'
-  ClientHeight = 831
-  ClientWidth = 994
+  Caption = 'AGD Viewer'
+  ClientHeight = 827
+  ClientWidth = 992
   Color = clBtnFace
   DragMode = dmAutomatic
   Font.Charset = DEFAULT_CHARSET
@@ -3572,18 +3572,16 @@ object frmMain: TfrmMain
     00000000000000000000000000000000000000FFFF0000FFFF0000FF070000C0
     0300008001000080010000000100000001000000000000000100008041000000
     07000000FF000081FF0000FFFF0000FFFF0000}
-  OldCreateOrder = False
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnDeactivate = FormDeactivate
   OnResize = FormResize
-  PixelsPerInch = 96
   TextHeight = 13
   object barStatus: TStatusBar
     Left = 0
-    Top = 812
-    Width = 994
+    Top = 808
+    Width = 992
     Height = 19
     Panels = <
       item
@@ -3613,8 +3611,8 @@ object frmMain: TfrmMain
   object pgcViews: TPageControl
     Left = 0
     Top = 40
-    Width = 994
-    Height = 598
+    Width = 992
+    Height = 594
     ActivePage = tabImages
     Align = alClient
     Font.Charset = ANSI_CHARSET
@@ -3628,15 +3626,11 @@ object frmMain: TfrmMain
     TabWidth = 120
     object tabImages: TTabSheet
       Caption = 'Images'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sbxView: TScrollBox
         Left = 0
         Top = 0
-        Width = 986
-        Height = 548
+        Width = 984
+        Height = 544
         VertScrollBar.Smooth = True
         VertScrollBar.Tracking = True
         Align = alClient
@@ -3646,12 +3640,13 @@ object frmMain: TfrmMain
         object imgView: TImage
           Left = 0
           Top = 0
-          Width = 986
+          Width = 984
           Height = 542
           Align = alTop
           OnMouseMove = imgViewMouseMove
           ExplicitLeft = -3
           ExplicitTop = 3
+          ExplicitWidth = 986
         end
         object imgZXFont: TImage
           Left = 16
@@ -3700,10 +3695,6 @@ object frmMain: TfrmMain
     object tabMap: TTabSheet
       Caption = 'Map'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object sbxMap: TScrollBox
         Left = 0
         Top = 0
@@ -3731,14 +3722,10 @@ object frmMain: TfrmMain
     object Events: TTabSheet
       Caption = 'Events'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ToolBar2: TToolBar
         Left = 0
         Top = 0
-        Width = 986
+        Width = 984
         AutoSize = True
         ButtonHeight = 32
         ButtonWidth = 32
@@ -3762,7 +3749,7 @@ object frmMain: TfrmMain
         end
         object cmbEvent: TComboBox
           Left = 57
-          Top = 4
+          Top = 0
           Width = 145
           Height = 24
           Style = csDropDownList
@@ -3808,8 +3795,8 @@ object frmMain: TfrmMain
       object txtEvents: TRichEdit
         Left = 0
         Top = 32
-        Width = 986
-        Height = 516
+        Width = 984
+        Height = 512
         Align = alClient
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
@@ -3822,21 +3809,16 @@ object frmMain: TfrmMain
         ScrollBars = ssBoth
         TabOrder = 1
         WordWrap = False
-        Zoom = 100
       end
     end
     object TabSheet1: TTabSheet
       Caption = 'Messages'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object memMessages: TMemo
         Left = 0
         Top = 0
-        Width = 986
-        Height = 548
+        Width = 984
+        Height = 544
         Align = alClient
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
@@ -3854,7 +3836,7 @@ object frmMain: TfrmMain
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 994
+    Width = 992
     Height = 40
     ButtonHeight = 40
     ButtonWidth = 40
@@ -3971,8 +3953,8 @@ object frmMain: TfrmMain
   end
   object panReport: TPanel
     Left = 0
-    Top = 638
-    Width = 994
+    Top = 634
+    Width = 992
     Height = 174
     Align = alBottom
     BevelOuter = bvNone
@@ -3981,21 +3963,23 @@ object frmMain: TfrmMain
     object Panel2: TPanel
       Left = 0
       Top = 0
-      Width = 994
+      Width = 992
       Height = 35
       Align = alTop
       TabOrder = 0
       object Label1: TLabel
         Left = 1
         Top = 1
-        Width = 36
-        Height = 13
+        Width = 957
+        Height = 33
         Align = alClient
         Caption = ' Report'
         Layout = tlCenter
+        ExplicitWidth = 36
+        ExplicitHeight = 13
       end
       object SpeedButton1: TSpeedButton
-        Left = 960
+        Left = 958
         Top = 1
         Width = 33
         Height = 33
@@ -4025,7 +4009,7 @@ object frmMain: TfrmMain
     object memReport: TMemo
       Left = 0
       Top = 35
-      Width = 994
+      Width = 992
       Height = 139
       Align = alClient
       Font.Charset = ANSI_CHARSET
@@ -4154,7 +4138,7 @@ object frmMain: TfrmMain
     Left = 220
     Top = 147
     Bitmap = {
-      494C010109006800180020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010109006800040020002000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       00000000000036000000280000008000000060000000010020000000000000C0
       000000000000000000000000000000000000000000050000000F000000150000
       0016000000160000001600000016000000160000001100000008000000050000
