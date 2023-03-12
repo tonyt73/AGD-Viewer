@@ -1,6 +1,14 @@
 # AGD-Viewer
 An application to view Arcade Game Designer .agd text files
 
+[![license](https://img.shields.io/github/license/tonyt73/AGD-Viewer?style=for-the-badge)](./LICENSE.txt)
+[![release](https://img.shields.io/github/v/release/tonyt73/AGD-Viewer?include_prereleases&style=for-the-badge)](https://github.com/tonyt73/AGD-Viewer/releases)
+[![downloads](https://img.shields.io/github/downloads/tonyt73/AGD-Viewer/total?style=for-the-badge)](https://github.com/tonyt73/AGD-Viewer/releases)
+
+![stars](https://img.shields.io/github/stars/tonyt73/AGD-Viewer?style=social)
+![forks](https://img.shields.io/github/forks/tonyt73/AGD-Viewer?style=social)
+![watchers](https://img.shields.io/github/watchers/tonyt73/AGD-Viewer?style=social)
+
 Load a .agd file and see it in all it's glory.
 
 
