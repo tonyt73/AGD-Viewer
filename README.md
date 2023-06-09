@@ -42,5 +42,5 @@ Supports:
 * Install the 32 bit and 64 bit Windows compilers (OSX, iOS & Android are optional)
 * Launch the Rad-Studio IDE
   * Open up the location you cloned this repo to
-  * Open the AGDx Viewer.cproj file
+  * Open the AGD Viewer.cproj file
 * Press F9 to build and run the application
