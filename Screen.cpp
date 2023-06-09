@@ -65,7 +65,7 @@ __fastcall GameScreen::GameScreen(const String& data, unsigned int screenIndex)
     }
     catch(...)
     {
-        g_ErrorReporter.Add("Error: Exception caught while converting Scrren data. [" + data + "]");
+        g_ErrorReporter.Add("Error: Exception caught while converting Screen data. [" + data + "]");
         throw;
     }
 }
