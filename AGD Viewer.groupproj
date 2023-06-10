@@ -3,7 +3,7 @@
         <ProjectGuid>{13C05718-3106-4868-BB27-9E8271D98E78}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="AGDx Viewer.cbproj">
+        <Projects Include="AGD Viewer.cbproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -14,23 +14,23 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="AGDx Viewer">
-        <MSBuild Projects="AGDx Viewer.cbproj"/>
+    <Target Name="AGD Viewer">
+        <MSBuild Projects="AGD Viewer.cbproj"/>
     </Target>
-    <Target Name="AGDx Viewer:Clean">
-        <MSBuild Projects="AGDx Viewer.cbproj" Targets="Clean"/>
+    <Target Name="AGD Viewer:Clean">
+        <MSBuild Projects="AGD Viewer.cbproj" Targets="Clean"/>
     </Target>
-    <Target Name="AGDx Viewer:Make">
-        <MSBuild Projects="AGDx Viewer.cbproj" Targets="Make"/>
+    <Target Name="AGD Viewer:Make">
+        <MSBuild Projects="AGD Viewer.cbproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="AGDx Viewer"/>
+        <CallTarget Targets="AGD Viewer"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="AGDx Viewer:Clean"/>
+        <CallTarget Targets="AGD Viewer:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="AGDx Viewer:Make"/>
+        <CallTarget Targets="AGD Viewer:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
